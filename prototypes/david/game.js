@@ -219,6 +219,13 @@ TenView.prototype.render = function () {
             for (i = 0; i < props.length; i++) {
                 document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
             }
+            
+            var html =""
+            for (i = 0; i < fighter.fight_queue.queue.length; i++) {
+                html+='<div class="action sword sword-' + fighter.fight_queue.queue[i].stance + '"></div>';
+            }
+            
+            document.getElementById(prefix + "actions").innerHTML = html;
         }
     }
 }  
