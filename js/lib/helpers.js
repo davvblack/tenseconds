@@ -8,6 +8,7 @@ var sin = Math.sin
 var cos = Math.cos
 var atan2 = Math.atan2
 var log = Math.log
+var rand = Math.random
 
 /*
   clamp a value between a min/max range
