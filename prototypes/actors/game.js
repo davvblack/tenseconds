@@ -196,7 +196,7 @@ var p2 = new Actor(600, 400, 'rgb(39, 174, 96)')
 
 ring.setPos = function (v) {
     ring.pos.set(v)
-    cam.updateDelay = 60
+    cam.updateDelay = 15
 }
 
 p1.targetActor = p2
@@ -225,34 +225,64 @@ cam.pos = v(0, 0).get()
 cam.center = v(ctx.canvas.width / 2, ctx.canvas.height / 2).get()
 cam.moveTo = null
 cam.target = ring
+cam.speed = 0
 cam.updateDelay = 15
+cam.scaleSize1 = ctx.canvas.height - 200
+cam.scaleDist1 = cam.center.dist()
+cam.scaleDistNorm = cam.center.norm().get()
+cam.scale = 1
 
-cam.tick = function () {
-    // get relative position of target (ring) to cam position
-    // set moveTo if necessary
-    // update position gradually
-    // change ctx transform?
+/**
+this is the place i'm having trouble
+this function updates the camera position, so as fighters
+move around, the camera will follow them so they don't go off screen
 
+when the fighters move close together to do attacks, I want the
+camera to zoom in, because its cool and makes it more interesting
 
+the problem is that i can't wrap my fucking head around how to account
+for the scaling in determining the offset of the camera position
+it seems relatively straightforward, but everything I've tried has
+been either totally wrong, or 'close'
+ */
+cam.tick = function (f) {
+    // adjust camera scale
+    var rs = 2 * this.target.r + 100
+    var s = approach(this.scale, this.scaleSize1 / rs, 0.01)
+    this.scale = s
 
+    // A is the center point of the screen, where we want to ring to be
     var A = vsum(this.pos, this.center).get()
+    // B is the position of 'the ring'
     var B = this.target.pos
+    // get the offset between A and B, as well as the distance
     var AB = vdiff(B, A).get()
     var d = AB.dist()
 
+    // this adds a bit of delay to camera follow
     if (this.updateDelay) {
         this.updateDelay--
     } else if (d > 0.5) {
-        this.pos.set(vsum(this.pos, AB.norm().prod(d / 20)))
+        // update position and speed of the camera
+        d = clamp(approach(this.speed, d / 15, 1), -10, 10)
+        this.pos.set(vsum(this.pos, AB.norm().prod(d)))
+        this.speed = d
     }
 
-    // var O = vdiff(this.pos, this.center).get()
 
-    ctx.setTransform(1, 0, 0, 1, -this.pos[0], -this.pos[1])
+    // reverse offset
+    var O = this.pos.prod(-1).get()
+
+    // prevent scaling
+    // comment out to see my problem
+    s = 1
+    // transform does translate first, then scale
+    // this workds fine for s == 1...
+    ctx.setTransform(s, 0, 0, s, O[0], O[1])
 
     A.free()
     AB.free()
-    // O.free()
+    O.free()
 }
 
 function draw () {
@@ -268,10 +298,10 @@ function draw () {
     ctx.clear()
     ctx.save()
         cam.tick()
-        // ctx.save()
-        //     ctx.strokeStyle = 'rgb(255,220,220)'
-        //     ring.draw(ctx)
-        // ctx.restore()
+        ctx.save()
+            ctx.strokeStyle = 'rgb(240,210,210)'
+            ring.draw(ctx)
+        ctx.restore()
         p1.draw(ctx)
         p2.draw(ctx)
     ctx.restore()
@@ -281,7 +311,7 @@ function draw () {
 draw()
 
 ctx.canvas.addEventListener('mousedown', function (e) {
-    ring.r = 50 + (Math.random() * 50) | 0
+    ring.r = 30 + (Math.random() * 70) | 0
     ring.setPos(vsum(cam.pos, v(e.offsetX, e.offsetY)))
 
 })
