@@ -11,6 +11,7 @@ function Actor (x, y, c) {
     this._speed = 0
     this.state = 0
     this.moveCoolDown = 0
+    this.attackRange = 30
 }
 
 Actor.prototype.draw = function (ctx) {
@@ -36,8 +37,9 @@ Actor.prototype.move = function () {
     var AB_ = AB.norm().get()
     var d = AB.dist()
 
-    if (d < 0.5)
-        this.moveTo = null
+    if (d < 0.5) {
+        this.idle()
+    }
 
     d = clamp(approach(this.speed, d / 10, 1), -8, 8)
 
@@ -68,7 +70,12 @@ Actor.prototype.rotateHead = function () {
 
 // choose a new target vector to move to
 Actor.prototype.chooseMoveTo = function () {
-    this.moveToArena()
+    // if idling
+    var d = vdiff(this.body.pos, this.targetActor.body.pos).dist()
+    if (this.state === 0 && abs(d - (this.targetArena.r * 2)) > 5)
+        this.moveToArena()
+    else if (this.state === 2)
+        this.moveToAttack()
 }
 
 // choose a target vector moving to arena position
@@ -91,12 +98,19 @@ Actor.prototype.moveToArena = function () {
     ACCB_.free()
     ACCB.free()
 
-    this.moveCoolDown = 30
+    this.moveState(30)
 }
 
 // choose a target vector moving toward the opponent
 Actor.prototype.moveToAttack = function () {
+    var A = this.body.pos
+    var B = this.targetActor.body.pos
+    // vector from target to this
+    var BA = vdiff(A, B).get()
 
+    this.moveTo = vsum(B, BA.norm().prod(this.attackRange)).get()
+
+    BA.free()
 }
 
 // choose a target vector moving away from attacking opponent
@@ -108,16 +122,31 @@ Actor.prototype.moveToDefend = function () {
 }
 
 // choose a target vector moving to the side of opponent
-Actor.prototype.moveToCircleStrafe = function () {}
+Actor.prototype.moveToCircleStrafe = function () {
+
+}
 
 // slow move in, resizing arena doown
 Actor.prototype.moveIn = function () {
+
     // move in small amount, push arena toward opponent and shink
 }
 
 // slow move out, defensive move
 Actor.prototype.moveOut = function () {
     // moveout small amount, pull arena towards self and expand
+}
+
+// set moveTo to null and update state
+Actor.prototype.idle = function () {
+    this.state = 0
+    this.moveTo.free()
+    this.moveTo = null
+}
+
+Actor.prototype.moveState = function (state, cooldown) {
+    this.state = 1
+    this.moveCoolDown = cooldown
 }
 
 var ctx = new Layer(900, 500)
@@ -132,6 +161,21 @@ p1.targetArena = ring
 p2.targetActor = p1
 p2.targetArena = ring
 
+var ui = {}
+ui.draw = function (ctx) {
+    var w = ctx.canvas.width
+    var h = ctx.canvas.height
+    ctx.save()
+    ctx.fillStyle = 'rgb(0, 0, 0)'
+    ctx.fillRect(0, 0, w, 100)
+    ctx.fillRect(0, h - 100, w, 100)
+    ctx.fillStyle = p1.body.color
+    ctx.fillRect(10, 10, 80, 80)
+    ctx.fillStyle = p2.body.color
+    ctx.fillRect(w - 90, h - 90, 80, 80)
+    ctx.restore()
+}
+
 function draw () {
     requestAnimationFrame(draw)
 
@@ -139,11 +183,17 @@ function draw () {
     p1.tick()
     p2.tick()
 
+
+
     // do dem draws
     ctx.clear()
-    ring.draw(ctx)
+    ctx.save()
+        ctx.strokeStyle = 'rgb(200,200,200)'
+        ring.draw(ctx)
+    ctx.restore()
     p1.draw(ctx)
     p2.draw(ctx)
+    ui.draw(ctx)
 }
 
 draw()
@@ -151,4 +201,11 @@ draw()
 ctx.canvas.addEventListener('mousedown', function (e) {
     ring.r = 30 + (Math.random() * 70) | 0
     ring.pos.set(v(e.offsetX, e.offsetY))
+})
+
+window.addEventListener('keydown', function (e) {
+    var key = e.keyCode
+
+    if (key === 81)
+        p1.state = 2
 })
