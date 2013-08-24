@@ -44,12 +44,13 @@ Actor.prototype.moveToRing = function () {
     // direction to thing we are moving towards
     var A = this.pos
     var B = this.follow
-    var C = this.moveTo
+    var C = this.moveTo.pos
+    var r = this.moveTo.r
     var AC = vdiff(C, A).get()
     var ACnorm = AC.norm().get()
     var CBnorm = vdiff(B, C).norm().get()
     var ACCBnorm = vsum(ACnorm, CBnorm).norm().get()
-    var ACCB = ACCBnorm.prod(50).get()
+    var ACCB = ACCBnorm.prod(r).get()
 
     // the actual target point
     var D = vdiff(C, ACCB).get()
@@ -57,7 +58,7 @@ Actor.prototype.moveToRing = function () {
     var ADnorm = AD.norm().get()
 
     // offset / direction to thing we are facing
-    var vFace = vdiff(this.follow, this.pos).get()
+    var vFace = vdiff(B, A).get()
     var vFaceNorm = vFace.norm().get()
 
     if (!isFinite(ADnorm[0]))
@@ -113,10 +114,10 @@ p2.side = -1
 var ring = new Circle(ctx.canvas.width/2, ctx.canvas.height/2, 50)
 
 p1.follow = p2.pos
-p1.moveTo = ring.pos
+p1.moveTo = ring
 
 p2.follow = p1.pos
-p2.moveTo = ring.pos
+p2.moveTo = ring
 
 ring.tracking = 1
 
@@ -166,6 +167,7 @@ draw()
 
 ctx.canvas.addEventListener('mousedown', function (e) {
     ring.tracking = 0
-    ring.r = 50
+    ring.r = 30 + (Math.random() * 70) | 0
     ring.pos.set(v(e.offsetX, e.offsetY))
+
 })
