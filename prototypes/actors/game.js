@@ -256,8 +256,9 @@ cam.tick = function (f) {
     // offset at the end.  this is almost right, except for high zoom
     // levels or coordinates far from the origin...
     var distToCenterScaled = this.scaleDist1 / s
+    // var SOFF = this.scaleDistNorm.prod(distToCenterScaled).get()
     var SOFF = vdiff(this.center, this.scaleDistNorm.prod(distToCenterScaled)).get()
-
+    SOFF.set(SOFF.prod(s))
     // A is the center point of the screen, where we want to ring to be
     var A = vsum(this.pos, this.center).get()
     // B is the position of 'the ring'
