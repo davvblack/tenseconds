@@ -84,7 +84,7 @@ FightQueue.prototype.tick = function () {
     if (this.fighter.is_player) {
         this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: NO_STANCE, power: 0};
     } else {
-        this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: STANCES.random_choice(), power: 0};
+        this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: (Math.random()>.5)?STANCES.random_choice(): NO_STANCE, power: 0};
     }
     
 };
