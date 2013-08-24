@@ -11,7 +11,11 @@ var ATTACKS = [LOW_ATTACK, HIGH_ATTACK];
 var BLOCK_MAP = {}
 BLOCK_MAP[HIGH_ATTACK] = HIGH_BLOCK;
 BLOCK_MAP[LOW_ATTACK] = LOW_BLOCK;
-
+var STANCE_NAMES = {}
+STANCE_NAMES[HIGH_ATTACK] = 'HIGH_ATTACK';
+STANCE_NAMES[HIGH_BLOCK] = 'HIGH_BLOCK';
+STANCE_NAMES[LOW_ATTACK] = 'LOW_ATTACK';
+STANCE_NAMES[LOW_BLOCK] = 'LOW_BLOCK';
 
 function input_handler(key_coords, model) {
     
@@ -35,10 +39,10 @@ FightQueue.prototype.tick = function () {
     
     var next_move = this.queue[0];
     
-    if (!((BLOCKS.contains(this.fighter.stance) && this.fighter.next_move.stance == NO_STANCE))) {
+    if (!((BLOCKS.contains(this.fighter.stance) && next_move.stance == NO_STANCE))) {
         this.fighter.stance = this.queue[0].stance;
     }
-    if(ATTACKS.contains(next_move)){
+    if(ATTACKS.contains(next_move.stance)){
         this.fighter.make_attack(next_move);
     }
     
@@ -50,14 +54,21 @@ FightQueue.prototype.tick = function () {
     
     this.fighter.power = max;
     
+    var show_moves = '';
+    
     for (i = 0; i < FIGHT_QUEUE_DEPTH - 1; i++) {
         this.queue[i] = this.queue[i+1];
+        show_moves += this.queue[i].stance + ',';
+    }
+    
+    if (this.fighter.is_player) {
+        console.log(show_moves);
     }
     
     this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: NO_STANCE, power: 0};
     
-    if (fighter.is_player || 1) {
-        console.log(this.queue);
+    if (this.fighter.is_player) {
+        //console.log(this.queue);
     }
 };
 
@@ -77,11 +88,10 @@ var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max
     this.tired = !stam;
     this.stance = NO_STANCE;
     this.blodied = (hp/hp_max < .5);
-    this.charged = 0;
+    this.power = 0;
 }
 
 Fighter.prototype.tick = function () {
-    console.log("fighter ticking");
     this.stam = Math.min(this.stam_max, this.stam + this.stam_charge);
     this.hp = Math.min(this.hp_max, this.hp + this.hp_charge);
     this.tired = false;
@@ -97,6 +107,7 @@ Fighter.prototype.add_fight = function (key_coords) {
     
     if (energy_spent > this.stam) {
         this.tired = true;
+        console.log('...zzz');
     } else {
         this.stam -= energy_spent;
         if ((stance != NO_STANCE) && (this.fight_queue.queue[delay].stance == stance )) {
@@ -113,7 +124,7 @@ Fighter.prototype.set_target = function (new_target) {
 }
 
 Fighter.prototype.make_attack = function (attack_stance) {
-    console.log("Making Attack " + attack_stance);
+    console.log("Making Attack " + STANCE_NAMES[attack_stance.stance] + attack_stance.power);
 }
 
 
@@ -128,9 +139,8 @@ var TenModel = function TenModel () {
 
 TenModel.prototype.tick = function () {
     for (member in this) {
-        console.log( member.tick, typeof(member.tick));
-        if (member && typeof(member.tick) != 'undefined') {
-            member.tick();
+        if (this.hasOwnProperty(member)) {
+            this[member].tick();
         }
     }
 }
@@ -147,7 +157,7 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
 
     this.input_controller = new KeyListener(qwerty, function(input){input_handler(input, that.model)});
     
-    this.heartbeat = setInterval(function () {that.model.tick(); console.log('tick')} , 1000);
+    this.heartbeat = setInterval(function () {that.model.tick();} , 1000);
 };
 
 
