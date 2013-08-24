@@ -45,3 +45,17 @@ function approach (current, goal, delta) {
 
     return current
 }
+
+Array.prototype.contains = function(obj) {
+    var i = this.length;
+    while (i--) {
+        if (this[i] == obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
+Array.prototype.random_choice = function () {
+    return this[Math.floor(Math.random() * this.length)];
+}
