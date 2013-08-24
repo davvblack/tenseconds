@@ -100,7 +100,7 @@ var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max
     this.dmg_base = dmg_base || .5;
     this.fight_queue = new FightQueue(this);
     this.stagger = 0;
-    this.stagger_charge = -1;
+    this.stagger_charge = -.25;
     this.target = null;
     
     //Public interface for view:
@@ -129,13 +129,13 @@ Fighter.prototype.post_tick = function () {
     
     if(ATTACKS.contains(this.stance)){
         if (BLOCK_MAP[this.stance] == this.target.stance) {
-            this.stagger += this.power;
+            this.stagger += this.target.power * 2;
             damage = this.power - this.target.power;
             if (damage>0) {
                 this.target.damage(damage);
             }
         } else {
-            this.target.damage((this.power + 1) * (1 - this.stagger / 10));
+            this.target.damage((this.power + 1) * (1 / (1 + this.stagger)));
             this.target.stagger += this.power;
         }
         
@@ -172,6 +172,7 @@ Fighter.prototype.make_attack = function (attack_stance) {
 }
 
 Fighter.prototype.damage = function (damage) {
+    damage = Math.floor(damage*4)/4;
     this.hp -= damage;
     if (this.hp / this.hp_max < .5) {
         this.bloodied = true;
