@@ -37,3 +37,9 @@ CanvasRenderingContext2D.prototype.lineToVector = function (v) {
     // console.log("line to "+v)
     return this
 }
+
+Sprite = function Sprite (w, h, u, v, src) {
+    this.w = w;
+    this.h = h;
+    
+}
