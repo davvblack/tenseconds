@@ -10,7 +10,10 @@ function Actor (x, y, c) {
     this.speed = 0
     this._speed = 0
     this.state = 0
+    this.attacking = 0
+    this.defending = 0
     this.moveCoolDown = 0
+    this.reactionCoolDown = 0
     this.attackRange = 30
 }
 
@@ -20,6 +23,13 @@ Actor.prototype.draw = function (ctx) {
 }
 
 Actor.prototype.tick = function () {
+    if (this.reactionCoolDown) {
+        this.reactionCoolDown--
+        if(!this.reactionCoolDown) {
+            return this.moveToDefend()
+        }
+    }
+
     if (this.moveTo !== null)
         this.move()
     else if (this.moveCoolDown > 0)
@@ -37,7 +47,7 @@ Actor.prototype.move = function () {
     var AB_ = AB.norm().get()
     var d = AB.dist()
 
-    if (d < 0.5) {
+    if (d < 1) {
         this.idle()
     }
 
@@ -70,12 +80,6 @@ Actor.prototype.rotateHead = function () {
 
 // choose a new target vector to move to
 Actor.prototype.chooseMoveTo = function () {
-    if (this.targetActor.state === 2) {
-        if (this.reactionCoolDown)
-            return this.reactionCoolDown--
-        else
-            return this.moveToDefend()
-    }
     var d = vdiff(this.body.pos, this.targetActor.body.pos).dist()
     var d2 = vdiff(this.body.pos, this.targetArena.pos).dist()
     if (this.state === 0
@@ -106,17 +110,27 @@ Actor.prototype.moveToArena = function () {
     ACCB_.free()
     ACCB.free()
 
-    this.moveState(30)
+    this.moveState(15)
 }
 
 // choose a target vector moving toward the opponent
 Actor.prototype.moveToAttack = function () {
+    // console.log('attack')
+    this.attacking = 1
+    this.targetActor.reactionCoolDown = 10
+
     var A = this.body.pos
     var B = this.targetActor.body.pos
     // vector from target to this
     var BA = vdiff(A, B).get()
 
-    this.moveTo = vsum(B, BA.norm().prod(this.attackRange)).get()
+    var r = rand()
+    if (r < 0.2)
+        this.moveTo = B.clone().get()
+    else if (r < 0.9)
+        this.moveTo = vsum(B, BA.norm().prod(this.attackRange)).get()
+    else
+        this.moveTo = vsum(B, BA.norm().prod(-this.attackRange)).get()
 
     BA.free()
 }
@@ -124,16 +138,20 @@ Actor.prototype.moveToAttack = function () {
 // choose a target vector moving away from attacking opponent
 // move and resize arena up
 Actor.prototype.moveToDefend = function () {
+    // console.log('defend')
+    this.defending = 1
     // pick a point that is desired arena size away from opponent
     // and in opposite direction of them
     // move the arena point to between two actors
     var A = this.body.pos
     var B = this.targetActor.body.pos
     var AB = vdiff(B, A).get()
+    var BA = AB.norm().prod(-1 * rand()).get()
     var dir = (rand() < 0.5) ? -1 : 1
     // get vector to position that is perpendicular to attacker movement
     // and twice attack range
-    var ABr = AB.norm().cross().prod(dir * this.attackRange * 2).get()
+    // var ABr = AB.norm().cross().prod(dir * this.attackRange * 2).get()
+    var ABr = vsum(AB.norm().cross().prod(dir), BA).norm().prod(this.attackRange * 2).get()
 
     this.moveTo = vsum(A, ABr).get()
 
@@ -141,6 +159,7 @@ Actor.prototype.moveToDefend = function () {
     this.targetArena.setPos(vsum(this.moveTo, D2B2.norm().prod(D2B2.dist() / 2)))
 
     AB.free()
+    BA.free()
     ABr.free()
     D2B2.free()
 }
@@ -163,15 +182,26 @@ Actor.prototype.moveOut = function () {
 
 // set moveTo to null and update state
 Actor.prototype.idle = function () {
-    this.state = 0
-    this.reactionCoolDown = 10
+    // this.state = 0
+    // this.reactionCoolDown = 3
+
+    if (this.attacking){
+        this.attacking = 0
+        this.moveCoolDown = 10
+    } else {
+        this.state = 0
+    }
+    if (this.defending) {
+        this.moveCoolDown = 10
+        this.defending = 0
+    }
     this.moveTo.free()
     this.moveTo = null
 }
 
-Actor.prototype.moveState = function (state, cooldown) {
+Actor.prototype.moveState = function (cooldown) {
     this.state = 1
-    this.moveCoolDown = cooldown
+    // this.moveCoolDown = cooldown
 }
 
 
@@ -194,9 +224,27 @@ var ring = new Circle(ctx.canvas.width/2, ctx.canvas.height/2, 50)
 var p1 = new Actor(200, 200, 'rgb(192, 57, 43)')
 var p2 = new Actor(600, 400, 'rgb(39, 174, 96)')
 
+ring.moveTo = ring.pos.clone().get()
+ring.speed = 0
 ring.setPos = function (v) {
-    ring.pos.set(v)
-    cam.updateDelay = 15
+    ring.moveTo.set(v)
+    cam.updateDelay = 30
+}
+
+ring.tick = function () {
+    var A = this.pos
+    var B = this.moveTo
+    var AB = vdiff(B, A).get()
+    var d = AB.dist()
+
+    if (d > 0.5) {
+        // update position and speed of the ring
+        d = clamp(approach(this.speed, d / 15, 0.5), -10, 10)
+        this.pos.set(vsum(this.pos, AB.norm().prod(d)))
+        this.speed = d
+    }
+
+    AB.free()
 }
 
 p1.targetActor = p2
@@ -248,7 +296,7 @@ been either totally wrong, or 'close'
 
 cam.tick = function (f) {
     // adjust camera scale
-    var rs = 2 * this.target.r + 100
+    var rs = 2 * (this.target.r + 25)
     var s = approach(this.scale, this.scaleSize1 / rs, 0.01)
     this.scale = s
 
@@ -263,11 +311,12 @@ cam.tick = function (f) {
     var d = AB.dist()
 
     // this adds a bit of delay to camera follow
-    if (this.updateDelay) {
-        this.updateDelay--
-    } else if (d > 0.5) {
+    // if (this.updateDelay) {
+    //     this.updateDelay--
+    // } else
+    if (d > 0.5) {
         // update position and speed of the camera
-        d = clamp(approach(this.speed, d / 15, 1), -10, 10)
+        d = clamp(approach(this.speed, d / 15, 0.5), -10, 10)
         this.pos.set(vsum(this.pos, AB.norm().prod(d)))
         this.speed = d
     }
@@ -289,6 +338,8 @@ cam.tick = function (f) {
     scaleOffsetVector.free()
 }
 
+var ticksTillRandomAction = 60
+
 function draw () {
     requestAnimationFrame(draw)
 
@@ -296,11 +347,22 @@ function draw () {
     p1.tick()
     p2.tick()
 
+    if (p1.state === 0 && p2.state === 0) {
+        if (ticksTillRandomAction)
+            ticksTillRandomAction--
+        else {
+            console.log('random action')
+            ticksTillRandomAction = 60
+        }
+
+    }
+
 
 
     // do dem draws
     ctx.clear()
     ctx.save()
+        ring.tick()
         cam.tick()
         ctx.save()
             ctx.strokeStyle = 'rgb(240,210,210)'
@@ -315,16 +377,19 @@ function draw () {
 draw()
 
 ctx.canvas.addEventListener('mousedown', function (e) {
-    // ring.r = 30 + (Math.random() * 70) | 0
+    ring.r = 30 + (((rand() * 2) + 0.4 | 0) * 20)
     ring.setPos(vsum(cam.pos, v(e.offsetX, e.offsetY)))
-
+    p1.state = 0
 })
 
 window.addEventListener('keydown', function (e) {
     var key = e.keyCode
 
     if (key === 81)
-        p1.state = 2
+        if (p1.state === 2)
+            p1.state = 0
+        else
+            p1.state = 2
 })
 
 document.getElementById('size').addEventListener('change', function (e) {
