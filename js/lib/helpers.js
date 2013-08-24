@@ -26,3 +26,21 @@ var mclamp = function (n, min, max) {
       n += max
     return n + min
 }
+
+/*
+  lineal interpolation for smoother changes in things like entity speed
+ */
+function approach (current, goal, delta) {
+    if (current === goal)
+        return goal
+
+    if (current < goal) {
+        current += delta
+        current = (current > goal) ? goal : current
+    } else if (current > goal) {
+        current -= delta
+        current = (current < goal) ? goal : current
+    }
+
+    return current
+}
