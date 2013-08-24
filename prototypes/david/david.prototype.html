@@ -2,10 +2,10 @@
 <head>
     <title>Input Queue Test</title>
     <style>
-        canvas { background: #f8f8f8; display: block; margin: 100px auto; border: 1px solid black;}
+        canvas { background: #f8f8f8; display: block; margin: 10px auto; border: 1px solid black;}
         html { background: #e8e8e8; font: 200 normal 14px/20px 'Helvetica Neue';}
-        #player{position:absolute; top: 50px; left:20px; width:120px;}
-        #enemy{position:absolute; top: 50px; right:20px; width:120px;}
+        #player{position:absolute; top: 350px; left:20px; width:120px;}
+        #enemy{position:absolute; top: 350px; right:20px; width:120px;}
         .action{ width: 100px; height:100px; display: inline-block; border:1px solid black;}
         .sword{ background: url('../../img/sword_sprites.png');
                 background-repeat:no-repeat;
@@ -15,10 +15,28 @@
         .sword-1{background-position: 0 -100px}
         .sword-2{background-position: 0 -200px}
         .sword-3{background-position: 0 -300px}
+        p {margin: .1em; position:relative;}
+        .action.action-small{
+        position: absolute;
+        top:-41px;
+        left:
+            transform: scale(.15,.15);
+            -ms-transform: scale(.15,.15);
+            -webkit-transform: scale(.15,.15);
+
+            }
+            
     </style>
 </head>
 <body>
     Input Queue Test
+    <p> Each of the rows on the keyboard is a single type of attack</p>
+    <p> 1-0: High Attack <span class="action action-small sword sword-0 "></span> </p>
+    <p> q-p: High Block <span class="action action-small sword sword-1 "></span> </p>
+    <p> a-;: Low Block <span class="action action-small sword sword-2 "></span> </p>
+    <p> z-/: Low Attack <span class="action action-small sword sword-3 "></span> </p>
+    <p> The further right key you press, the less stamina it takes, but also the longer the delay.</p>
+    <p> Balance catching your enemy off guard with saving enough stamina to block.</p>
     <br>
     <script src="../../js/lib/helpers.js"></script>
     <script src="../../js/lib/vector.js"></script>
