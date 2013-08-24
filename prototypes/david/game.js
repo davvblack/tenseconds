@@ -26,7 +26,7 @@ var FightQueue = function FightQueue (fighter) {
     this.max_power = 0;
     
     for (i = 0; i < FIGHT_QUEUE_DEPTH; i++) {
-        queue[i] = {stance: NO_STANCE, power:0};
+        this.queue[i] = {stance: NO_STANCE, power: 0};
     }
 }
 
@@ -50,17 +50,26 @@ FightQueue.prototype.tick = function () {
     
     this.fighter.power = max;
     
-}
+    for (i = 0; i < FIGHT_QUEUE_DEPTH - 1; i++) {
+        this.queue[i] = this.queue[i+1];
+    }
+    
+    this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: NO_STANCE, power: 0};
+    
+    if (fighter.is_player) {
+        console.log(this.queue);
+    }
+};
 
-var Fighter = function Fighter (is_player=false, hp=10, hp_max=10, hp_charge=0, stam=10, stam_max=10, stam_charge=1, dmg_base=.5) {
-    this.is_player = is_player;
-    this.hp = hp;
-    this.hp_max = hp_max;
-    this.hp_charge = hp_charge;
-    this.stam = stam;
-    this.stam_max = stam_max;
-    this.stam_charge = stam_charge;
-    this.dmg_base = dmg_base;
+var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max, stam_charge, dmg_base) {
+    this.is_player = is_player || false;
+    this.hp = hp || 10;
+    this.hp_max = hp_max || 10;
+    this.hp_charge = hp_charge || 0;
+    this.stam = stam || 10;
+    this.stam_max = stam_max || 10;
+    this.stam_charge = stam_charge || 1;
+    this.dmg_base = dmg_base || .5;
     this.fight_queue = new FightQueue(this);
     this.target = null;
     
@@ -103,7 +112,7 @@ Fighter.prototype.set_target = function (new_target) {
 }
 
 Fighter.prototype.make_attack = function (attack_stance) {
-    
+    console.log("Making Attack " + attack_stance);
 }
 
 
@@ -111,8 +120,8 @@ var TenModel = function TenModel () {
     this.player = new Fighter(true);
     this.opponent = new Fighter(false);
     
-    player.set_target(opponent);
-    opponent.set_target(player);
+    this.player.set_target(this.opponent);
+    this.opponent.set_target(this.player);
     
 }
 
@@ -127,12 +136,15 @@ TenModel.prototype.tick = function () {
 
 
 var GameEngine = function GameEngine(ctx, keyboard_layout) {
+    var that = this;
+    
     this.ctx = ctx;
     this.keyboard_layout = keyboard_layout;
-    
-    this.input_controller = new KeyListener(qwerty, function(input){input_handler(input, ctx)});
-    
+
     this.model = new TenModel();
+
+    this.input_controller = new KeyListener(qwerty, function(input){input_handler(input, that.model)});
+    
     
 };
 
