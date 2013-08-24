@@ -245,20 +245,15 @@ for the scaling in determining the offset of the camera position
 it seems relatively straightforward, but everything I've tried has
 been either totally wrong, or 'close'
  */
+
 cam.tick = function (f) {
     // adjust camera scale
     var rs = 2 * this.target.r + 100
     var s = approach(this.scale, this.scaleSize1 / rs, 0.01)
     this.scale = s
-    // s = 0.5
-    // try to get the difference between the view scaled and
-    // unscaled as a vector offset that i can add to the existing
-    // offset at the end.  this is almost right, except for high zoom
-    // levels or coordinates far from the origin...
-    var distToCenterScaled = this.scaleDist1 / s
-    // var SOFF = this.scaleDistNorm.prod(distToCenterScaled).get()
-    var SOFF = vdiff(this.center, this.scaleDistNorm.prod(distToCenterScaled)).get()
-    SOFF.set(SOFF.prod(s))
+
+    var scaleOffsetVector = this.target.pos.prod(s - 1).get()
+
     // A is the center point of the screen, where we want to ring to be
     var A = vsum(this.pos, this.center).get()
     // B is the position of 'the ring'
@@ -277,11 +272,7 @@ cam.tick = function (f) {
         this.speed = d
     }
 
-
-    // reverse offset
-    // var O = this.pos.prod(-1).get()
-
-    var O = vsum(this.pos, SOFF).prod(-1).get()
+    var offsetVector = vsum(this.pos, scaleOffsetVector).prod(-1).get()
 
     // prevent scaling
     // comment out to see my problem
@@ -289,13 +280,13 @@ cam.tick = function (f) {
     // transform does translate first, then scale
     // this workds fine for s == 1...
     // console.log(SOFF + '')
-    ctx.setTransform(s, 0, 0, s, O[0], O[1])
+    ctx.setTransform(s, 0, 0, s, offsetVector[0], offsetVector[1])
     // ctx.translate(SOFF[0], SOFF[1])
 
     A.free()
     AB.free()
-    O.free()
-    SOFF.free()
+    offsetVector.free()
+    scaleOffsetVector.free()
 }
 
 function draw () {
