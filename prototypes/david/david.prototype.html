@@ -1,13 +1,13 @@
 <html>
 <head>
-    <title>dancers</title>
+    <title>Input Queue Test</title>
     <style>
         canvas { background: #f8f8f8; display: block; margin: 100px auto; border: 1px solid black;}
         html { background: #e8e8e8; font: 200 normal 14px/20px 'Helvetica Neue';}
     </style>
 </head>
 <body>
-    Input Queue test
+    Input Queue Test
     <br>
     <script src="../../js/lib/helpers.js"></script>
     <script src="../../js/lib/vector.js"></script>
@@ -15,4 +15,20 @@
     <script src="../../js/lib/geometry.js"></script>
     <script src="../../js/lib/keyboard.js"></script>
     <script src="game.js"></script>
+    <div id ="player">
+        <p>Player: <span></span></p>
+        <p>Health: <span id="player_hp"></span></p>
+        <p>Stamina: <span id="player_stam"></span></p>
+        <p>Stagger: <span id="player_stagger"></span></p>
+        <p>Bloodied: <span id="player_bloodied"></span></p>
+        <p>Tired: <span id="player_tired"></span></p>
+    </div>
+    <div id ="enemy">
+        <p>Enemy: <span></span></p>
+        <p>Health: <span id="enemy_hp"></span></p>
+        <p>Stamina: <span id="enemy_stam"></span></p>
+        <p>Stagger: <span id="enemy_stagger"></span></p>
+        <p>Bloodied: <span id="enemy_bloodied"></span></p>
+        <p>Tired: <span id="enemy_tired"></span></p>
+    </div>
 </body>

@@ -54,3 +54,7 @@ Array.prototype.contains = function(obj) {
     }
     return false;
 }
+
+Array.prototype.random_choice = function () {
+    return this[Math.floor(Math.random() * this.length)];
+}
