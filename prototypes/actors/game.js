@@ -250,7 +250,7 @@ cam.tick = function (f) {
     var rs = 2 * this.target.r + 100
     var s = approach(this.scale, this.scaleSize1 / rs, 0.01)
     this.scale = s
-
+    // s = 0.5
     // try to get the difference between the view scaled and
     // unscaled as a vector offset that i can add to the existing
     // offset at the end.  this is almost right, except for high zoom
@@ -323,7 +323,7 @@ function draw () {
 draw()
 
 ctx.canvas.addEventListener('mousedown', function (e) {
-    ring.r = 30 + (Math.random() * 70) | 0
+    // ring.r = 30 + (Math.random() * 70) | 0
     ring.setPos(vsum(cam.pos, v(e.offsetX, e.offsetY)))
 
 })
@@ -333,4 +333,8 @@ window.addEventListener('keydown', function (e) {
 
     if (key === 81)
         p1.state = 2
+})
+
+document.getElementById('size').addEventListener('change', function (e) {
+    ring.r = +this.value
 })
