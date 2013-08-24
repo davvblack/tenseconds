@@ -100,7 +100,7 @@ var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max
     this.dmg_base = dmg_base || .5;
     this.fight_queue = new FightQueue(this);
     this.stagger = 0;
-    this.stagger_charge = -.25;
+    this.stagger_charge = -.125;
     this.target = null;
     
     //Public interface for view:
@@ -129,7 +129,7 @@ Fighter.prototype.post_tick = function () {
     
     if(ATTACKS.contains(this.stance)){
         if (BLOCK_MAP[this.stance] == this.target.stance) {
-            this.stagger += this.target.power * 2;
+            this.stagger += this.target.power;
             damage = this.power - this.target.power;
             if (damage>0) {
                 this.target.damage(damage);

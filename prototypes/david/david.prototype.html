@@ -2,7 +2,7 @@
 <head>
     <title>Input Queue Test</title>
     <style>
-        canvas { background: #f8f8f8; display: block; margin: 10px auto; border: 1px solid black;}
+        canvas { background: #f8f8f8; display: block; margin: 5px auto; border: 1px solid black;}
         html { background: #e8e8e8; font: 200 normal 14px/20px 'Helvetica Neue';}
         #player{position:absolute; top: 350px; left:20px; width:120px;}
         #enemy{position:absolute; top: 350px; right:20px; width:120px;}
@@ -15,7 +15,7 @@
         .sword-1{background-position: 0 -100px}
         .sword-2{background-position: 0 -200px}
         .sword-3{background-position: 0 -300px}
-        p {margin: .1em; position:relative;}
+        p {margin: .05em; position:relative;}
         .action.action-small{
         position: absolute;
         top:-41px;
@@ -37,6 +37,9 @@
     <p> z-m: Low Attack <span class="action action-small sword sword-3 "></span> </p>
     <p> The further right key you press, the less stamina it takes, but also the longer the delay.</p>
     <p> Balance catching your enemy off guard with saving enough stamina to block.</p>
+    <p> Make a high attack against a low block, and a high block against a high attack.</p>
+    <p> Blocking at exactly the right moment staggers the enemy, reducing his damage for a while.</p>
+    <p> You can stack the same attack in the same square, dealing more damage and staggering when it hits.</p>
     <br>
     <script src="../../js/lib/helpers.js"></script>
     <script src="../../js/lib/vector.js"></script>
