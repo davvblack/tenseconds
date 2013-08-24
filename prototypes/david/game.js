@@ -56,7 +56,7 @@ FightQueue.prototype.tick = function () {
     
     this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: NO_STANCE, power: 0};
     
-    if (fighter.is_player) {
+    if (fighter.is_player || 1) {
         console.log(this.queue);
     }
 };
@@ -81,6 +81,7 @@ var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max
 }
 
 Fighter.prototype.tick = function () {
+    console.log("fighter ticking");
     this.stam = Math.min(this.stam_max, this.stam + this.stam_charge);
     this.hp = Math.min(this.hp_max, this.hp + this.hp_charge);
     this.tired = false;
@@ -127,7 +128,8 @@ var TenModel = function TenModel () {
 
 TenModel.prototype.tick = function () {
     for (member in this) {
-        if ('tick' in member) {
+        console.log( member.tick, typeof(member.tick));
+        if (member && typeof(member.tick) != 'undefined') {
             member.tick();
         }
     }
@@ -145,7 +147,7 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
 
     this.input_controller = new KeyListener(qwerty, function(input){input_handler(input, that.model)});
     
-    
+    this.heartbeat = setInterval(function () {that.model.tick(); console.log('tick')} , 1000);
 };
 
 
