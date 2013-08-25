@@ -1,3 +1,5 @@
+var tick = 0;
+
 var FIGHT_QUEUE_DEPTH = 10;
 
 //Stance constants. Always refer to them by name.
@@ -243,7 +245,7 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
     
     this.input_controller = new KeyListener(qwerty, function(input){input_handler(input, that.model)});
     
-    this.heartbeat = setInterval(function () {that.model.tick();} , 1000);
+    this.heartbeat = setInterval(function () {if(tick)that.model.tick();} , 1000);
     
     this.frame_renderer = setInterval(function () {that.view.render();}, 100)
 };

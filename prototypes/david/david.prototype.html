@@ -2,7 +2,7 @@
 <head>
     <title>Input Queue Test</title>
     <style>
-        canvas { background: #f8f8f8; display: block; margin: 5px auto; border: 1px solid black;}
+        canvas { background: #f8f8f8; display: block; margin: 15px auto; border: 1px solid black;}
         html { background: #e8e8e8; font: 200 normal 14px/20px 'Helvetica Neue';}
         #player{position:absolute; top: 350px; left:20px; width:120px;}
         #enemy{position:absolute; top: 350px; right:20px; width:120px;}
@@ -15,64 +15,77 @@
         .sword-1{background-position: 0 -100px}
         .sword-2{background-position: 0 -200px}
         .sword-3{background-position: 0 -300px}
+        
         p {margin: .05em; position:relative;}
         .action.action-small{
-        position: absolute;
-        top:-41px;
-        left:
+            position: absolute;
+            top:-41px;
+            left:
             transform: scale(.15,.15);
             -ms-transform: scale(.15,.15);
             -webkit-transform: scale(.15,.15);
-
             }
-            
+        #dialog_container {
+            position: absolute;
+            width: 100%;
+            height:100%;
+            top: 0;
+            text-align: center;
+        }
+        .dialog {
+            position: relative;
+            text-align: left;
+            display: inline-block;
+            -moz-border-radius: 15px;
+            border-radius: 15px;
+            box-shadow: 5px 5px 25px;
+            margin: 100px auto;
+            background: white;
+            padding:10px;
+        }
+        .dialog button{
+            width: 
+        }
+        #left-instructions {
+            width: 35%;
+            float: left;
+        }
+        #right-instructions {
+            width: 60%;
+            float: right;
+        }
+        
     </style>
 </head>
 <body>
-    Input Queue Test
-    <p> Each of the rows on the keyboard is a single type of attack</p>
-    <p> 1-0: High Attack <span class="action action-small sword sword-0 "></span> </p>
-    <p> q-p: High Block <span class="action action-small sword sword-1 "></span> </p>
-    <p> a-l: Low Block <span class="action action-small sword sword-2 "></span> </p>
-    <p> z-m: Low Attack <span class="action action-small sword sword-3 "></span> </p>
-    <p> The further right key you press, the less stamina it takes, but also the longer the delay.</p>
-    <p> Balance catching your enemy off guard with saving enough stamina to block.</p>
-    <p> Make a high attack against a low block, and a high block against a high attack.</p>
-    <p> Blocking at exactly the right moment staggers the enemy, reducing his damage for a while.</p>
-    <p> You can stack the same attack in the same square, dealing more damage and staggering when it hits.</p>
-    <br>
+    <p><b>Ten Second Samurai</b></p>
+    <div id = "left-instructions">
+        <p> Each of the rows on the keyboard is a single type of attack:</p>
+        <p> <b>1-0</b>: High Attack <span class="action action-small sword sword-0 "></span> </p>
+        <p> <b>q-p</b>: High Block <span class="action action-small sword sword-1 "></span> </p>
+        <p> <b>a-;</b>: Low Block <span class="action action-small sword sword-2 "></span> </p>
+        <p> <b>z-/</b>: Low Attack <span class="action action-small sword sword-3 "></span> </p>
+    </div>
+    <div id = "right-instructions">
+        <p> The further right key you press, the less stamina it takes, but also the longer the delay.</p>
+        <p> Balance catching your enemy off guard with saving enough stamina to block.</p>
+        <p> Make a high attack against a low block, and a high block against a high attack (etc).</p>
+        <p> Blocking at exactly the right moment staggers the enemy, reducing his damage for a while.</p>
+        <p> You can stack the same attack in the same square, dealing more damage and staggering when it hits.</p>
+    </div>
     <script src="../../js/lib/helpers.js"></script>
     <script src="../../js/lib/vector.js"></script>
     <script src="../../js/lib/graphics.js"></script>
     <script src="../../js/lib/geometry.js"></script>
     <script src="../../js/lib/keyboard.js"></script>
+    <script src="../../js/dialog.js"></script>
     <script src="game.js"></script>
     
     You:
     <div id="player_actions">
-        <div class="action sword sword-1"></div>
-        <div class="action sword sword-1"></div>
-        <div class="action sword sword-2"></div>
-        <div class="action sword sword--1"></div>
-        <div class="action sword sword-0"></div>
-        <div class="action sword sword-3"></div>
-        <div class="action sword sword-2"></div>
-        <div class="action sword sword--1"></div>
-        <div class="action sword sword-0"></div>
-        <div class="action sword sword-3"></div>
     </div>
     Him:
     <div id="enemy_actions">
-        <div class="action sword sword-1"></div>
-        <div class="action sword sword-1"></div>
-        <div class="action sword sword-2"></div>
-        <div class="action sword sword--1"></div>
-        <div class="action sword sword-0"></div>
-        <div class="action sword sword-3"></div>
-        <div class="action sword sword-2"></div>
-        <div class="action sword sword--1"></div>
-        <div class="action sword sword-0"></div>
-        <div class="action sword sword-3"></div>
     </div>
 
     
@@ -92,4 +105,6 @@
         <p>Bloodied: <span id="enemy_bloodied"></span></p>
         <p>Tired: <span id="enemy_tired"></span></p>
     </div>
+    
+    <div id="dialog_container"></div>
 </body>
