@@ -62,8 +62,8 @@
         <p> Each of the rows on the keyboard is a single type of attack:</p>
         <p> <b>1-0</b>: High Attack <span class="action action-small sword sword-0 "></span> </p>
         <p> <b>q-p</b>: High Block <span class="action action-small sword sword-1 "></span> </p>
-        <p> <b>a-;</b>: Low Block <span class="action action-small sword sword-2 "></span> </p>
-        <p> <b>z-/</b>: Low Attack <span class="action action-small sword sword-3 "></span> </p>
+        <p> <b>a-;</b>: Low Attack <span class="action action-small sword sword-3 "></span> </p>
+        <p> <b>z-/</b>: Low Block <span class="action action-small sword sword-2 "></span> </p>
     </div>
     <div id = "right-instructions">
         <p> The further right key you press, the less stamina it takes, but also the longer the delay.</p>
@@ -107,6 +107,7 @@
     </div>
     <p>Keyboard Layout:
     <button id="qwerty" onclick="engine.input_controller.set_layout(qwerty)">qwerty</button>
+    <button id="dvorak" onclick="engine.input_controller.set_layout(dvorak)">dvorak</button>
     <button id="azerty" onclick="engine.input_controller.set_layout(azerty)">azerty</button>
     <button id="qwertz" onclick="engine.input_controller.set_layout(qwertz)">qwertz</button></p>
     <div id="dialog_container"></div>
