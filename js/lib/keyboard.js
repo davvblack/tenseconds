@@ -56,6 +56,6 @@ var qwertz = new KeyboardLayout([decode_keys("1234567890"),
 
 var azerty = new KeyboardLayout([decode_keys("1234567890"),
                                  decode_keys("azertyuiop"),
-                                 decode_keys("qsdfghjklm").concat([77]),
+                                 decode_keys("qsdfghjklm"),
                                  decode_keys("wxcvbn").concat([188,186,186,187]),//wtf two 186 ;:
                                  decode_keys(" ")]);
