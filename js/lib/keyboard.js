@@ -12,7 +12,7 @@ var KeyboardLayout = function KeyboardLayout(rows_of_keys) {
 }
 
 KeyboardLayout.prototype.get_key_location = function (key) {
-    return this.key_map[key.toLowerCase()];
+    return this.key_map[key];
 }
 
 var KeyListener = function KeyListener(keyboard_layout, callback) {
@@ -25,8 +25,22 @@ var KeyListener = function KeyListener(keyboard_layout, callback) {
 KeyListener.prototype.set_listener = function (callback) {
     var that = this;
     document.onkeydown = function(e){
-        callback(that.keyboard_layout.get_key_location(String.fromCharCode(e.keyCode)))
+        console.log(e.keyCode);
+        callback(that.keyboard_layout.get_key_location(e.keyCode));//.fromCharCode(e.keyCode)))
     };
 }
 
-var qwerty = new KeyboardLayout(["1234567890", "qwertyuiop", "asdfghjkl;", "zxcvbnm,./", " "]);
+function decode_keys(string) {
+    var string_arr = string.split("");
+    var key_codes = [];
+    for (var i =0; i<string_arr.length; i++) {
+        key_codes.push(string_arr[i].toUpperCase().charCodeAt(0));
+    }
+    return key_codes;
+}
+
+var qwerty = new KeyboardLayout([decode_keys("1234567890"),
+                                 decode_keys("qwertyuiop"),
+                                 decode_keys("asdfghjkl").concat([186]),
+                                 decode_keys("zxcvbnm").concat([188,190,191]),
+                                 decode_keys(" ")]);
