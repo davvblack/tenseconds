@@ -1,4 +1,4 @@
-var tick = 0;
+var tick = 1;
 
 var FIGHT_QUEUE_DEPTH = 10;
 

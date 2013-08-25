@@ -28,7 +28,6 @@
         #dialog_container {
             position: absolute;
             width: 100%;
-            height:100%;
             top: 0;
             text-align: center;
         }
@@ -73,6 +72,7 @@
         <p> Blocking at exactly the right moment staggers the enemy, reducing his damage for a while.</p>
         <p> You can stack the same attack in the same square, dealing more damage and staggering when it hits.</p>
     </div>
+    
     <script src="../../js/lib/helpers.js"></script>
     <script src="../../js/lib/vector.js"></script>
     <script src="../../js/lib/graphics.js"></script>
@@ -105,6 +105,9 @@
         <p>Bloodied: <span id="enemy_bloodied"></span></p>
         <p>Tired: <span id="enemy_tired"></span></p>
     </div>
-    
+    <p>Keyboard Layout:
+    <span id="qwerty" onclick="engine.input_controller.set_layout(qwerty)">qwerty</span>,
+    <span id="azerty" onclick="engine.input_controller.set_layout(azerty)">azerty</span>,
+    <span id="qwertz" onclick="engine.input_controller.set_layout(qwertz)">qwertz</span></p>
     <div id="dialog_container"></div>
 </body>
