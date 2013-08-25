@@ -25,6 +25,7 @@ var KeyListener = function KeyListener(keyboard_layout, callback) {
 KeyListener.prototype.set_listener = function (callback) {
     var that = this;
     document.onkeydown = function(e){
+        console.log(e.keyCode);
         callback(that.keyboard_layout.get_key_location(e.keyCode));//.fromCharCode(e.keyCode)))
     };
 }
@@ -58,4 +59,10 @@ var azerty = new KeyboardLayout([decode_keys("1234567890"),
                                  decode_keys("azertyuiop"),
                                  decode_keys("qsdfghjklm"),
                                  decode_keys("wxcvbn").concat([188,186,186,187]),//wtf two 186 ;:
+                                 decode_keys(" ")]);
+
+var dvorak = new KeyboardLayout([decode_keys("1234567890"),
+                                 [39,188,190].concat(decode_keys("pyfgcrl")),
+                                 decode_keys("aoeuidhtns"),
+                                 [186].concat(decode_keys("qjkxbmwvz")),
                                  decode_keys(" ")]);
