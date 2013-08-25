@@ -56,6 +56,14 @@ Array.prototype.contains = function(obj) {
     return false;
 }
 
-Array.prototype.random_choice = function () {
+Array.prototype.random_choice = function (key_too) {
+    if (key_too) {
+        var i = Math.floor(Math.random() * this.length);
+        return [i, this[i]];
+    }
     return this[Math.floor(Math.random() * this.length)];
+}
+
+function roll (target) {
+    return Math.random() < target;
 }

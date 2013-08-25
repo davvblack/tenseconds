@@ -13,6 +13,11 @@ var ATTACKS = [LOW_ATTACK, HIGH_ATTACK];
 var BLOCK_MAP = {}
 BLOCK_MAP[HIGH_ATTACK] = HIGH_BLOCK;
 BLOCK_MAP[LOW_ATTACK] = LOW_BLOCK;
+var COUNTER_MAP = {}
+COUNTER_MAP[HIGH_ATTACK] = HIGH_BLOCK;
+COUNTER_MAP[LOW_ATTACK] = LOW_BLOCK;
+COUNTER_MAP[HIGH_BLOCK] = LOW_ATTACK;
+COUNTER_MAP[LOW_BLOCK] = HIGH_ATTACK;
 var STANCE_NAMES = {}
 STANCE_NAMES[HIGH_ATTACK] = 'HIGH_ATTACK';
 STANCE_NAMES[HIGH_BLOCK] = 'HIGH_BLOCK';
@@ -82,16 +87,70 @@ FightQueue.prototype.tick = function () {
     
     console.log(((this.fighter.is_player)?"player:":"enemy: ") + show_moves + " stance: " + STANCE_NAMES[this.fighter.stance] + this.fighter.power);
     
-    
-    if (this.fighter.is_player) {
-        this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: NO_STANCE, power: 0};
+    this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: NO_STANCE, power: 0};
+    /*if (this.fighter.is_player) {
+        
     } else {
         this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: (Math.random()>.5)?STANCES.random_choice(): NO_STANCE, power: 0};
-    }
+    }*/
     
 };
 
-var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max, stam_charge, dmg_base, stagger, stager_charge) {
+var MockBody = function MockBody () {};
+
+MockBody.prototype.add_fight = function (fight_coords) {
+    console.log(fight_coords);
+}
+
+var AiManager = function AiManager (body, ai_params) {
+    this.initiative = .6;
+    this.high_low = .5;
+    this.reactiveness = 0;
+    this.agro = .6;
+    this.defense = .4;
+    this.berserk = 0;
+
+    for (var param in (ai_params || {}))
+        if (ai_params.hasOwnProperty(param)) 
+            this[param] = ai_params[param];
+
+    this.body = body;
+}
+
+AiManager.prototype.pick_action = function () {
+    if (roll(this.initiative)) {
+        this.body.add_fight([roll(this.agro)?ATTACKS[(Number)(!roll(this.high_low))]:BLOCKS[(Number)(!roll(this.high_low))], FIGHT_QUEUE_DEPTH-1]);
+    } else if (roll(this.reactiveness)) {
+        var countering = this.body.target.fight_queue.queue.random_choice(true);
+        if (countering[1].stance != NO_STANCE) {
+            my_counter_stance = COUNTER_MAP[countering[1].stance];
+            if (BLOCKS.contains(my_counter_stance)) {
+                var bother = 1;
+                var my_queue = this.body.fight_queue.queue;
+                for (var i = countering[0] - 1; i > 0; i--) {
+                    if (my_queue[i].stance == my_counter_stance) {
+                        bother = 0;
+                        break;
+                    }
+                    if (my_queue[i].stance != NO_STANCE && my_queue[i].stance != my_counter_stance)
+                    {
+                        break;
+                    }
+                }
+                if (bother) {
+                    this.body.add_fight([my_counter_stance, countering[0]]);
+                }
+            } else {
+                this.body.add_fight([my_counter_stance, countering[0]]);
+            }
+            
+        }
+    } else if (roll(this.berserk)) {
+        this.body.add_fight([ATTACKS[(Number)(!roll(this.high_low))], Math.floor(Math.random() * FIGHT_QUEUE_DEPTH)]);
+    }
+}
+
+var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max, stam_charge, dmg_base, stagger, stager_charge, ai_params) {
     this.is_player = is_player || false;
     this.hp = hp || 10;
     this.hp_max = hp_max || 10;
@@ -104,7 +163,8 @@ var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max
     this.stagger = 0;
     this.stagger_charge = -.125;
     this.target = null;
-    
+    this.ai_manager = new AiManager(this, ai_params || {});
+
     //Public interface for view:
     this.tired = !stam;
     this.stance = NO_STANCE;
@@ -140,7 +200,10 @@ Fighter.prototype.post_tick = function () {
             this.target.damage((this.power + 1) * (1 / (1 + this.stagger)));
             this.target.stagger += this.power;
         }
-        
+    }
+    
+    if (!this.is_player) {
+        this.ai_manager.pick_action();
     }
 }
 
