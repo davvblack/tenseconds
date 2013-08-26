@@ -1,9 +1,36 @@
-
 var gameContainer = document.getElementById('game-container')
-
-
 var ctx = new Layer(900, 500);
 gameContainer.appendChild(ctx.canvas);
+
+
+var swordSprite = new Image()
+swordSprite.onload = function () {
+    // do something
+}
+swordSprite.src = 'img/sword_sprites.png';
+
+uiSymbols = {
+    "sword-0" : {
+        img: swordSprite,
+        pos: v(0, 0).get(),
+        size: v(100, 100).get()
+    },
+    "sword-1" : {
+        img: swordSprite,
+        pos: v(0, 100).get(),
+        size: v(100, 100).get()
+    },
+    "sword-3" : {
+        img: swordSprite,
+        pos: v(0, 200).get(),
+        size: v(100, 100).get()
+    },
+    "sword-2" : {
+        img: swordSprite,
+        pos: v(0, 300).get(),
+        size: v(100, 100).get()
+    }
+}
 
 
 
@@ -21,27 +48,35 @@ var TenView = function TenView(ctx, model) {
     uiComponent = new Layer(900, 100)
     uiComponent.canvas.id = "enemy-ui"
     gameContainer.appendChild(uiComponent.canvas)
-    this.uiComponents.player = uiComponent
+    this.uiComponents.enemy = uiComponent
 }
 
 
 TenView.prototype.render = function () {
-    var fighter, prefix, i;
+    var fighter, prefix, i, type, stance, symbol, drawSymbolPosition
     var props = ["bloodied", "hp", "stam", "stagger", "tired"];
     for (member in this.model) {
         if (this.model.hasOwnProperty(member) && this.model[member].is_fighter) {
             fighter = this.model[member];
-            prefix = (fighter.is_player)?"player_":"enemy_";
+
+            type = (fighter.is_player) ? 'player' : 'enemy'
+            prefix = type + '_'
+
+            uiComponent = this.uiComponents[type]
+            uiComponent.clear()
             for (i = 0; i < props.length; i++) {
                 document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
             }
 
-            var html =""
             for (i = 0; i < fighter.fight_queue.queue.length; i++) {
-                html+='<div class="action sword sword-' + fighter.fight_queue.queue[i].stance + '"></div>';
+                stance = fighter.fight_queue.queue[i].stance
+                if (stance > -1) {
+                    drawSymbolPosition = v(i * 90 + 10, 10).get()
+                    symbol = uiSymbols['sword-' + stance]
+                    uiComponent.drawImage(symbol.img, symbol.pos[0], symbol.pos[1], symbol.size[0], symbol.size[1],
+                        drawSymbolPosition[0], drawSymbolPosition[1], 80, 80)
+                }
             }
-
-            document.getElementById(prefix + "actions").innerHTML = html;
         }
     }
 }
@@ -430,7 +465,7 @@ function draw () {
         if (ticksTillRandomAction)
             ticksTillRandomAction--
         else {
-            console.log('random action')
+            // console.log('random action')
             ticksTillRandomAction = 60
         }
 
