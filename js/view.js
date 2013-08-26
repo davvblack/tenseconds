@@ -1,4 +1,68 @@
 
+var ctx = new Layer(900, 500);
+document.body.appendChild(ctx.canvas);
+
+// TenView.prototype.render = function () {
+//     var fighter, prefix, i;
+//     var props = ["bloodied", "hp", "stam", "stagger", "tired"];
+//     for (member in this.model) {
+//         if (this.model.hasOwnProperty(member) && this.model[member].is_fighter) {
+//             fighter = this.model[member];
+//             prefix = (fighter.is_player)?"player_":"enemy_";
+//             for (i = 0; i < props.length; i++) {
+//                 document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
+//             }
+
+//             var html =""
+//             for (i = 0; i < fighter.fight_queue.queue.length; i++) {
+//                 html+='<div class="action sword sword-' + fighter.fight_queue.queue[i].stance + '"></div>';
+//             }
+
+//             document.getElementById(prefix + "actions").innerHTML = html;
+//         }
+//     }
+// }
+
+var TenView = function TenView(ctx, model) {
+    this.ctx = ctx;
+    this.model = model;
+
+    this.uiComponents = {}
+
+    var fighter, uiComponent
+    for (member in model) {
+        if (!model.hasOwnProperty(member))
+            continue
+
+        fighter = model[member]
+        uiComponent = new Layer(900, 100)
+        uiComponent.canvas.id = (fighter.is_player) ? "player-ui" : "enemy-ui"
+        document.body.appendChild(uiComponent)
+        this.uiComponents[member] = uiComponent
+    }
+}
+
+TenView.prototype.render = function () {
+    var fighter, prefix, i;
+    var props = ["bloodied", "hp", "stam", "stagger", "tired"];
+    for (member in this.model) {
+        if (this.model.hasOwnProperty(member)) {
+            fighter = this.model[member];
+            prefix = (fighter.is_player)?"player_":"enemy_";
+            for (i = 0; i < props.length; i++) {
+                document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
+            }
+
+            var html =""
+            for (i = 0; i < fighter.fight_queue.queue.length; i++) {
+                html+='<div class="action sword sword-' + fighter.fight_queue.queue[i].stance + '"></div>';
+            }
+
+            document.getElementById(prefix + "actions").innerHTML = html;
+        }
+    }
+}
+
 //                                   .                 .                                         88                         .
 //                                 .o8               .o8                                        .8'                       .o8
 // oo.ooooo.  oooo d8b  .ooooo.  .o888oo  .ooooo.  .o888oo oooo    ooo oo.ooooo.   .ooooo.     .8'   .oooo.    .ooooo.  .o888oo  .ooooo.  oooo d8b  .oooo.o
@@ -228,8 +292,8 @@ Actor.prototype.moveState = function (cooldown) {
 // "Y88888P'
 
 
-var ctx = new Layer(900, 500)
-document.body.appendChild(ctx.canvas)
+// var ctx = new Layer(900, 500)
+// document.body.appendChild(ctx.canvas)
 
 var ring = new Circle(ctx.canvas.width/2, ctx.canvas.height/2, 50)
 var p1 = new Actor(200, 200, 'rgb(192, 57, 43)')
@@ -367,9 +431,6 @@ function draw () {
         }
 
     }
-
-
-
     // do dem draws
     ctx.clear()
     ctx.save()

@@ -27,17 +27,17 @@ STANCE_NAMES[NO_STANCE] = 'NO_STANCE';
 var STANCES = [NO_STANCE, HIGH_ATTACK, HIGH_BLOCK, LOW_ATTACK, LOW_BLOCK];
 
 function input_handler(key_coords, model) {
-    
+
     model.player.add_fight(key_coords);
 }
 
 var FightQueue = function FightQueue (fighter) {
     var i;
-    
+
     this.fighter = fighter;
     this.queue = [];
     this.max_power = 0;
-    
+
     for (i = 0; i < FIGHT_QUEUE_DEPTH; i++) {
         this.queue[i] = {stance: NO_STANCE, power: 0};
     }
@@ -45,20 +45,20 @@ var FightQueue = function FightQueue (fighter) {
 
 FightQueue.prototype.tick = function () {
     var i;
-    
+
     var next_move = this.queue[0];
-    
+
     if (BLOCKS.contains(this.fighter.stance)) {
         console.log("decay block");
         this.fighter.power = 0;
     }
-    
+
     if ((next_move.stance != this.fighter.stance) && BLOCKS.contains(next_move.stance)) {
         console.log("new block");
         this.fighter.stance = next_move.stance;
         this.fighter.power = 1;
     }
-    
+
     if (ATTACKS.contains(next_move.stance)) {
         this.fighter.stance = next_move.stance;
         this.fighter.power = next_move.power;
@@ -68,32 +68,32 @@ FightQueue.prototype.tick = function () {
             this.fighter.power = 0;
         }
     }
-    
+
     var max = 0;
     i = FIGHT_QUEUE_DEPTH - 1;
     while (i-- + 1) {
         max = Math.max(max, this.queue.power);
     }
-    
+
     this.fighter.max_power = max;
-    
+
     var show_moves = '';
-    
+
     for (i = 0; i < FIGHT_QUEUE_DEPTH - 1; i++) {
         this.queue[i] = this.queue[i+1];
         show_moves += this.queue[i].stance + ',';
     }
-    
-    
+
+
     console.log(((this.fighter.is_player)?"player:":"enemy: ") + show_moves + " stance: " + STANCE_NAMES[this.fighter.stance] + this.fighter.power);
-    
+
     this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: NO_STANCE, power: 0};
     /*if (this.fighter.is_player) {
-        
+
     } else {
         this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: (Math.random()>.5)?STANCES.random_choice(): NO_STANCE, power: 0};
     }*/
-    
+
 };
 
 var MockBody = function MockBody () {};
@@ -111,7 +111,7 @@ var AiManager = function AiManager (body, ai_params) {
     this.berserk = 0;
 
     for (var param in (ai_params || {}))
-        if (ai_params.hasOwnProperty(param)) 
+        if (ai_params.hasOwnProperty(param))
             this[param] = ai_params[param];
 
     this.body = body;
@@ -142,7 +142,7 @@ AiManager.prototype.pick_action = function () {
             } else {
                 this.body.add_fight([my_counter_stance, countering[0]]);
             }
-            
+
         }
     } else if (roll(this.berserk)) {
         this.body.add_fight([ATTACKS[(Number)(!roll(this.high_low))], Math.floor(Math.random() * FIGHT_QUEUE_DEPTH)]);
@@ -170,7 +170,7 @@ var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max
     this.bloodied = (this.hp/this.hp_max < .5);
     this.power = 0;
     this.max_power = 0;
-    
+
     this.is_fighter = true;
 }
 
@@ -191,16 +191,16 @@ Fighter.prototype.tick = function () {
     if (this.hp / this.hp_max >= .5) {
         this.bloodied = false;
     }
-    
+
     this.stagger = Math.max(0, this.stagger + this.stagger_charge);
     this.tired = false;
     this.fight_queue.tick();
 }
 
 Fighter.prototype.post_tick = function () {
-    
+
     var damage = 0;
-    
+
     if(ATTACKS.contains(this.stance)){
         if (BLOCK_MAP[this.stance] == this.target.stance) {
             this.stagger += this.target.power;
@@ -213,7 +213,7 @@ Fighter.prototype.post_tick = function () {
             this.target.stagger += this.power;
         }
     }
-    
+
     if (!this.is_player) {
         this.ai_manager.pick_action();
     }
@@ -223,9 +223,9 @@ Fighter.prototype.add_fight = function (key_coords) {
     var stance = key_coords[0];
     var delay = key_coords[1];
 
-    
+
     var energy_spent = (stance != NO_STANCE) && (FIGHT_QUEUE_DEPTH - delay);
-    
+
     if (energy_spent > this.stam) {
         this.tired = true;
         console.log('...zzz');
@@ -277,7 +277,7 @@ TenModel.prototype.set_opponent_by_id = function(opponent_id){
 TenModel.prototype.reset_fight = function () {
     this.player.set_target(this.opponent);
     this.opponent.set_target(this.player);
-    
+
     for (member in this) {
         if (this.hasOwnProperty(member) && this[member].is_fighter) {
             var fighter = this[member];
@@ -300,58 +300,32 @@ TenModel.prototype.tick = function () {
 }
 
 
-var TenView = function TenView(ctx, model) {
-    this.ctx = ctx;
-    this.model = model;
-}
-
-TenView.prototype.render = function () {
-    var fighter, prefix, i;
-    var props = ["bloodied", "hp", "stam", "stagger", "tired"];
-    for (member in this.model) {
-        if (this.model.hasOwnProperty(member) && this.model[member].is_fighter) {
-            fighter = this.model[member];
-            prefix = (fighter.is_player)?"player_":"enemy_";
-            for (i = 0; i < props.length; i++) {
-                document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
-            }
-            
-            var html =""
-            for (i = 0; i < fighter.fight_queue.queue.length; i++) {
-                html+='<div class="action sword sword-' + fighter.fight_queue.queue[i].stance + '"></div>';
-            }
-            
-            document.getElementById(prefix + "actions").innerHTML = html;
-        }
-    }
-}  
 
 
 var GameEngine = function GameEngine(ctx, keyboard_layout) {
     var that = this;
-    
+
     this.ctx = ctx;
     this.keyboard_layout = keyboard_layout;
 
     this.model = new TenModel();
-    
+
     this.view = new TenView(ctx, this.model);
-    
+
     this.input_controller = new KeyListener(qwerty, function(input){input_handler(input, that.model)});
-    
+
     this.heartbeat = setInterval(function () {if(tick)that.model.tick();} , 1000);
-    
+
     this.frame_renderer = setInterval(function () {that.view.render();}, 100);
 
     parse_fighters(fighter_definitions, this.model.fighters);
-    
+
     this.model.set_player_by_id(0);
     this.model.set_opponent_by_id(1);
 
 };
 
-var ctx = new Layer(900, 500);
-document.body.appendChild(ctx.canvas);
+// moved ctx definition into view.js
 
 var engine = new GameEngine(ctx, qwerty);
 
