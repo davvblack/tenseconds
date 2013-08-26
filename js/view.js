@@ -1,27 +1,11 @@
 
+var gameContainer = document.getElementById('game-container')
+
+
 var ctx = new Layer(900, 500);
-document.body.appendChild(ctx.canvas);
+gameContainer.appendChild(ctx.canvas);
 
-// TenView.prototype.render = function () {
-//     var fighter, prefix, i;
-//     var props = ["bloodied", "hp", "stam", "stagger", "tired"];
-//     for (member in this.model) {
-//         if (this.model.hasOwnProperty(member) && this.model[member].is_fighter) {
-//             fighter = this.model[member];
-//             prefix = (fighter.is_player)?"player_":"enemy_";
-//             for (i = 0; i < props.length; i++) {
-//                 document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
-//             }
 
-//             var html =""
-//             for (i = 0; i < fighter.fight_queue.queue.length; i++) {
-//                 html+='<div class="action sword sword-' + fighter.fight_queue.queue[i].stance + '"></div>';
-//             }
-
-//             document.getElementById(prefix + "actions").innerHTML = html;
-//         }
-//     }
-// }
 
 var TenView = function TenView(ctx, model) {
     this.ctx = ctx;
@@ -29,24 +13,23 @@ var TenView = function TenView(ctx, model) {
 
     this.uiComponents = {}
 
-    var fighter, uiComponent
-    for (member in model) {
-        if (!model.hasOwnProperty(member))
-            continue
+    var uiComponent = new Layer(900, 100)
+    uiComponent.canvas.id = "player-ui"
+    gameContainer.appendChild(uiComponent.canvas)
+    this.uiComponents.player = uiComponent
 
-        fighter = model[member]
-        uiComponent = new Layer(900, 100)
-        uiComponent.canvas.id = (fighter.is_player) ? "player-ui" : "enemy-ui"
-        document.body.appendChild(uiComponent)
-        this.uiComponents[member] = uiComponent
-    }
+    uiComponent = new Layer(900, 100)
+    uiComponent.canvas.id = "enemy-ui"
+    gameContainer.appendChild(uiComponent.canvas)
+    this.uiComponents.player = uiComponent
 }
+
 
 TenView.prototype.render = function () {
     var fighter, prefix, i;
     var props = ["bloodied", "hp", "stam", "stagger", "tired"];
     for (member in this.model) {
-        if (this.model.hasOwnProperty(member)) {
+        if (this.model.hasOwnProperty(member) && this.model[member].is_fighter) {
             fighter = this.model[member];
             prefix = (fighter.is_player)?"player_":"enemy_";
             for (i = 0; i < props.length; i++) {
@@ -62,6 +45,27 @@ TenView.prototype.render = function () {
         }
     }
 }
+
+// TenView.prototype.render = function () {
+//     var fighter, prefix, i;
+//     var props = ["bloodied", "hp", "stam", "stagger", "tired"];
+//     for (member in this.model) {
+//         if (this.model.hasOwnProperty(member)) {
+//             fighter = this.model[member];
+//             prefix = (fighter.is_player)?"player_":"enemy_";
+//             for (i = 0; i < props.length; i++) {
+//                 document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
+//             }
+
+//             var html =""
+//             for (i = 0; i < fighter.fight_queue.queue.length; i++) {
+//                 html+='<div class="action sword sword-' + fighter.fight_queue.queue[i].stance + '"></div>';
+//             }
+
+//             document.getElementById(prefix + "actions").innerHTML = html;
+//         }
+//     }
+// }
 
 //                                   .                 .                                         88                         .
 //                                 .o8               .o8                                        .8'                       .o8
