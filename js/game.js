@@ -297,8 +297,8 @@ TenModel.prototype.reset_fight = function () {
     this.opponent.set_target(this.player);
     if (this.player.dead) {
         tick = 0;
-        var dialog_text = "<h1>You died...<h1><p>" +
-        this.fighters[this.opponent_id].desc;
+        var dialog_text = "<h1>You died...</h1><p>" +
+        this.fighters[this.opponent_id].desc + "</p>";
         var diedalog = new DialogBox(dialog_text);
         diedalog.open();
     }
