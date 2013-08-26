@@ -49,7 +49,6 @@ FightQueue.prototype.tick = function () {
     var next_move = this.queue[0];
 
     if (BLOCKS.contains(this.fighter.stance)) {
-        console.log("decay block");
         this.fighter.power = 0;
     }
 
@@ -83,17 +82,10 @@ FightQueue.prototype.tick = function () {
         this.queue[i] = this.queue[i+1];
         show_moves += this.queue[i].stance + ',';
     }
-
-
-    console.log(((this.fighter.is_player)?"player:":"enemy: ") + show_moves + " stance: " + STANCE_NAMES[this.fighter.stance] + this.fighter.power);
-
+   
+    //console.log(((this.fighter.is_player)?"player:":"enemy: ") + show_moves + " stance: " + STANCE_NAMES[this.fighter.stance] + this.fighter.power);
+    
     this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: NO_STANCE, power: 0};
-    /*if (this.fighter.is_player) {
-
-    } else {
-        this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: (Math.random()>.5)?STANCES.random_choice(): NO_STANCE, power: 0};
-    }*/
-
 };
 
 var MockBody = function MockBody () {};
@@ -119,7 +111,7 @@ var AiManager = function AiManager (body, ai_params) {
 
 AiManager.prototype.pick_action = function () {
     if (roll(this.initiative)) {
-        this.body.add_fight([roll(this.agro)?ATTACKS[(Number)(!roll(this.high_low))]:BLOCKS[(Number)(!roll(this.high_low))], FIGHT_QUEUE_DEPTH-1]);
+        this.body.add_fight([roll(this.agro)?ATTACKS[(Number)(roll(this.high_low))]:BLOCKS[(Number)(roll(this.high_low))], FIGHT_QUEUE_DEPTH-1]);
     } else if (roll(this.reactiveness)) {
         var countering = this.body.target.fight_queue.queue.random_choice(true);
         if (countering[1].stance != NO_STANCE) {
@@ -151,6 +143,7 @@ AiManager.prototype.pick_action = function () {
 
 var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max, stam_charge, dmg_base, stagger, stager_charge, ai_params) {
     this.is_player = is_player || false;
+    this.is_dead = false;
     this.hp = hp || 100;
     this.hp_max = hp_max || 100;
     this.hp_charge = hp_charge || 0;
@@ -183,6 +176,7 @@ Fighter.prototype.reset = function () {
     this.bloodied = (this.hp/this.hp_max < .5);
     this.power = 0;
     this.max_power = 0;
+    this.is_dead = false;
 }
 
 Fighter.prototype.tick = function () {
@@ -286,25 +280,11 @@ TenModel.prototype.reset_fight = function () {
     }
 }
 
-TenModel.prototype.tick = function () {
-    for (member in this) {
-        if (this.hasOwnProperty(member) && this[member].tick) {
-            this[member].tick();
-        }
-    }
-    for (member in this) {
-        if (this.hasOwnProperty(member) && this[member].post_tick) {
-            this[member].post_tick();
-        }
-    }
-}
-
-
-
 
 var GameEngine = function GameEngine(ctx, keyboard_layout) {
     var that = this;
-
+    
+    this.tick = false;
     this.ctx = ctx;
     this.keyboard_layout = keyboard_layout;
 
@@ -314,19 +294,37 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
 
     this.input_controller = new KeyListener(qwerty, function(input){input_handler(input, that.model)});
 
-    this.heartbeat = setInterval(function () {if(tick)that.model.tick();} , 1000);
-
+    
+    this.heartbeat = setInterval(function () {if(that.tick)that.tick();} , 1000);
+    
     this.frame_renderer = setInterval(function () {that.view.render();}, 100);
 
     parse_fighters(fighter_definitions, this.model.fighters);
 
     this.model.set_player_by_id(0);
     this.model.set_opponent_by_id(1);
-
+    
 };
 
 // moved ctx definition into view.js
 
+GameEngine.prototype.tick = function () {
+    for (member in this.model) {
+        if (this.model.hasOwnProperty(member) && this.model[member].tick) {
+            this.model[member].tick();
+        }
+    }
+    for (member in this.model.model) {
+        if (this.model.hasOwnProperty(member) && this.model[member].post_tick) {
+            if (this.model[member].is_fighter && this.model[member].is_dead) {
+                console.log(",.,, someone died");
+            }
+            this.model[member].post_tick();
+        }
+    }
+}
+
+ctx = null;
 var engine = new GameEngine(ctx, qwerty);
 
 //var listener = new KeyListener(qwerty, function(pressed){console.log(pressed)});

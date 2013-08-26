@@ -327,7 +327,7 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
     this.heartbeat = setInterval(function () {if(tick)that.model.tick();} , 1000);
     
     this.frame_renderer = setInterval(function () {that.view.render();}, 100);
-        
+    
     parse_fighters(fighter_definitions, this.model.fighters);
 };
 
