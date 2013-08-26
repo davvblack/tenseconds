@@ -277,8 +277,19 @@ TenModel.prototype.set_player_by_id = function(player_id){
 }
 
 TenModel.prototype.set_opponent_by_id = function(opponent_id){
-    this.opponent = this.fighters[opponent_id].fighter;
+    var fight_obj = this.fighters[opponent_id];
+    
+    this.opponent = fight_obj.fighter;
+    
+    var dialog_text = "<h1>" + fight_obj.name + "</h1><p>" + fight_obj.desc + "</p>"; 
+    
+    tick = 0;
+    
+    var fighter_dialog = new DialogBox(dialog_text);
+    
     this.reset_fight();
+    
+    fighter_dialog.open();
 }
 
 TenModel.prototype.reset_fight = function () {
