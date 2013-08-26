@@ -143,7 +143,7 @@ AiManager.prototype.pick_action = function () {
 
 var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max, stam_charge, dmg_base, stagger, stager_charge, ai_params) {
     this.is_player = is_player || false;
-    this.is_dead = false;
+    this.dead = false;
     this.hp = hp || 100;
     this.hp_max = hp_max || 100;
     this.hp_charge = hp_charge || 0;
@@ -176,7 +176,7 @@ Fighter.prototype.reset = function () {
     this.bloodied = (this.hp/this.hp_max < .5);
     this.power = 0;
     this.max_power = 0;
-    this.is_dead = false;
+    this.dead = false;
 }
 
 Fighter.prototype.tick = function () {
@@ -316,7 +316,7 @@ GameEngine.prototype.tick = function () {
     }
     for (member in this.model) {
         if (this.model.hasOwnProperty(member) && this.model[member].post_tick) {
-            if (this.model[member].is_fighter && this.model[member].is_dead) {
+            if (this.model[member].is_fighter && this.model[member].dead) {
                 console.log(",.,, someone died");
             }
             this.model[member].post_tick();
