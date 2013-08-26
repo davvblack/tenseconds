@@ -2,7 +2,7 @@
 <head>
     <title>Input Queue Test</title>
     <style>
-        canvas { background: #f8f8f8; display: block; }
+        canvas { background: #f8f8f8; display: block; margin: 15px auto; border: 1px solid black;}
         html { background: #e8e8e8; font: 200 normal 14px/20px 'Helvetica Neue';}
         #player{position:absolute; top: 350px; left:20px; width:120px;}
         #enemy{position:absolute; top: 350px; right:20px; width:120px;}
@@ -54,30 +54,6 @@
             float: right;
         }
 
-
-        canvas { position: absolute; }
-        #game-container {
-            position:relative;
-            width: 900px;
-            height: 500px;
-            margin: auto;
-            display: block;
-                    }
-
-        #player-ui {
-            top: 0;
-            left: 0;
-            z-index: 100;
-            background: black;
-        }
-
-        #enemy-ui {
-            bottom: 0;
-            left: 0;
-            z-index:100;
-            background: black;
-        }
-
     </style>
 </head>
 <body>
@@ -96,8 +72,6 @@
         <p> Blocking at exactly the right moment staggers the enemy, reducing his damage for a while.</p>
         <p> You can stack the same attack in the same square, dealing more damage and staggering when it hits.</p>
     </div>
-    <div style="clear:both">&nbsp;</div>
-    <div id="game-container"></div>
 
     <script src="js/lib/helpers.js"></script>
     <script src="js/lib/vector.js"></script>
@@ -105,19 +79,10 @@
     <script src="js/lib/geometry.js"></script>
     <script src="js/lib/keyboard.js"></script>
     <script src="js/dialog.js"></script>
-
     <script src="js/fighters.js"></script>
     <script src="data/fighter_definitions.data.js"></script>
-    <script src="js/view.js"></script>
     <script src="js/game.js"></script>
-
-    You:
-    <div id="player_actions">
-    </div>
-    Him:
-    <div id="enemy_actions">
-    </div>
-
+    <script src="js/view.js"></script>
 
     <div id ="player">
         <p>Player: <span></span></p>
