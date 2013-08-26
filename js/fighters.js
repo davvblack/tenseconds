@@ -2,7 +2,7 @@ function parse_fighters(fighter_definitions, fighters) {
     var new_char, i, total = fighter_definitions.length, gen_attr, ai_attr;
     for (i = 0; i < total; i++) {
         new_char = fighter_definitions[i];
-        gen_attr = [false];
+        gen_attr = [i==0];
         gen_attr = gen_attr.concat(new_char.slice(1,10));
         ai_attr = new_char.slice(10,16);
         gen_attr.push({

@@ -249,12 +249,26 @@ Fighter.prototype.damage = function (damage) {
 }
 
 var TenModel = function TenModel () {
-    this.player = new Fighter(true);
-    this.opponent = new Fighter(false);
+    this.player = null;
+    this.opponent = null;
     this.fighters = [];
     
+    
+}
+
+TenModel.prototype.set_opponent_by_id = function(opponent_id){
+    
+}
+
+TenModel.prototype.reset_fight = function () {
     this.player.set_target(this.opponent);
     this.opponent.set_target(this.player);
+    
+    for (member in this) {
+        if (this.model.hasOwnProperty(member) && this.model[member].is_fighter) {
+            var fighter = this.model[member];
+            fighter.hp = fighter.max_hp;
+            fighter.stam
     
 }
 
