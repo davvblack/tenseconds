@@ -18,12 +18,11 @@
 
         p {margin: .05em; position:relative;}
         .action.action-small{
-            position: absolute;
-            top:-41px;
-            left:
-            transform: scale(.15,.15);
-            -ms-transform: scale(.15,.15);
-            -webkit-transform: scale(.15,.15);
+            margin-top:-10px;
+            left: 10px;
+            tranxsform: scale(.15,.15);
+            -ms-traxnsform: scale(.15,.15);
+            -webkit-traxnsform: scale(.15,.15);
             }
         #dialog_container {
             position: absolute;
@@ -80,16 +79,20 @@
             background:transparent;
         }
 
+        td{position: relative; white-space: pre}
     </style>
 </head>
 <body>
     <p><b>Ten Second Samurai</b></p>
     <div id = "left-instructions">
         <p> Each of the rows on the keyboard is a single type of attack:</p>
-        <p> <b>1-0</b>: High Attack <span class="action action-small sword sword-0 "></span> </p>
-        <p> <b>q-p</b>: High Block <span class="action action-small sword sword-1 "></span> </p>
-        <p> <b>a-;</b>: Low Attack <span class="action action-small sword sword-2 "></span> </p>
-        <p> <b>z-/</b>: Low Block <span class="action action-small sword sword-3 "></span> </p>
+        <table border="0" cellpadding="0">
+        <tr><td><p> <b>1-0</b>: High Attack</p> </td><td><span class="action action-small sword sword-0 "></span> </td>
+        <td><p> <b>q-p</b>: High Block</p> </td><td><span class="action action-small sword sword-1 "></span> </td>
+        </td></tr>
+        <tr><td><p> <b>a-;</b>: Low Attack</p> </td><td><span class="action action-small sword sword-2 "></span> </td>
+        <td><p> <b>z-/</b>: Low Block</p> </td><td><span class="action action-small sword sword-3 "></span> </td>
+        </tr></table>
     </div>
     <div id = "right-instructions">
         <p> The further right key you press, the less stamina it takes, but also the longer the delay.</p>
