@@ -314,7 +314,7 @@ GameEngine.prototype.tick = function () {
             this.model[member].tick();
         }
     }
-    for (member in this.model.model) {
+    for (member in this.model) {
         if (this.model.hasOwnProperty(member) && this.model[member].post_tick) {
             if (this.model[member].is_fighter && this.model[member].is_dead) {
                 console.log(",.,, someone died");
