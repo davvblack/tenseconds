@@ -7,7 +7,7 @@
         #player{position:absolute; top: 350px; left:20px; width:120px;}
         #enemy{position:absolute; top: 350px; right:20px; width:120px;}
         .action{ width: 100px; height:100px; display: inline-block; border:1px solid black;}
-        .sword{ background: url('../../img/sword_sprites.png');
+        .sword{ background: url('img/sword_sprites.png');
                 background-repeat:no-repeat;
                 background-position: 0 100px;
             }
@@ -15,7 +15,7 @@
         .sword-1{background-position: 0 -100px}
         .sword-3{background-position: 0 -200px}
         .sword-2{background-position: 0 -300px}
-        
+
         p {margin: .05em; position:relative;}
         .action.action-small{
             position: absolute;
@@ -43,7 +43,7 @@
             padding:10px;
         }
         .dialog button{
-            width: 
+            width:
         }
         #left-instructions {
             width: 35%;
@@ -53,7 +53,7 @@
             width: 60%;
             float: right;
         }
-        
+
     </style>
 </head>
 <body>
@@ -72,15 +72,15 @@
         <p> Blocking at exactly the right moment staggers the enemy, reducing his damage for a while.</p>
         <p> You can stack the same attack in the same square, dealing more damage and staggering when it hits.</p>
     </div>
-    
-    <script src="../../js/lib/helpers.js"></script>
-    <script src="../../js/lib/vector.js"></script>
-    <script src="../../js/lib/graphics.js"></script>
-    <script src="../../js/lib/geometry.js"></script>
-    <script src="../../js/lib/keyboard.js"></script>
-    <script src="../../js/dialog.js"></script>
-    <script src="game.js"></script>
-    
+
+    <script src="js/lib/helpers.js"></script>
+    <script src="js/lib/vector.js"></script>
+    <script src="js/lib/graphics.js"></script>
+    <script src="js/lib/geometry.js"></script>
+    <script src="js/lib/keyboard.js"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/game.js"></script>
+
     You:
     <div id="player_actions">
     </div>
@@ -88,7 +88,7 @@
     <div id="enemy_actions">
     </div>
 
-    
+
     <div id ="player">
         <p>Player: <span></span></p>
         <p>Health: <span id="player_hp"></span></p>
