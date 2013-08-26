@@ -324,7 +324,6 @@ GameEngine.prototype.tick = function () {
     }
 }
 
-ctx = null;
 var engine = new GameEngine(ctx, qwerty);
 
 //var listener = new KeyListener(qwerty, function(pressed){console.log(pressed)});
