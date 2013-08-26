@@ -292,6 +292,7 @@ TenModel.prototype.reset_fight = function () {
 var GameEngine = function GameEngine(ctx, keyboard_layout) {
     var that = this;
 
+
     this.opponent_id = 1;
 
     this.paused = true;
@@ -310,6 +311,7 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
     this.frame_renderer = setInterval(function () {that.view.render();}, 100);
 
     parse_fighters(fighter_definitions, this.model.fighters);
+    this.model.opponent_id = 1;
 
     this.model.set_player_by_id(0);
     this.model.set_opponent_by_id(1);
@@ -335,7 +337,7 @@ GameEngine.prototype.tick = function () {
                     this.model.reset_fight();
                 } else {
                     console.log("you win");
-                    this.model.set_opponent_by_id(++this.opponent_id);
+                    this.model.set_opponent_by_id(++this.model.opponent_id);
                 }
                 //Prevent winloss. I think this means the player always wins in a tie.
                 break;
