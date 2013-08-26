@@ -361,10 +361,11 @@ Actor.prototype.moveToAttack = function () {
     var r = rand()
     if (!this.strike)
         this.moveTo = vsum(B, BA.norm().prod(this.attackRange)).get()
-    else if (this.strike)
-        this.moveTo = B.clone().get()
     else if (this.powerStrike)
-        this.moveTo = vsum(B, BA.norm().prod(-1.5 * this.attackRange)).get()
+        this.moveTo = vsum(B, BA.norm().prod(-4 * this.attackRange)).get()
+    else
+        this.moveTo = B.clone().get()
+
     BA.free()
 }
 
@@ -622,6 +623,9 @@ var TenView = function TenView(ctx, model) {
     this.ctx = ctx;
     this.model = model;
 
+    this.playerDead = 0
+    this.reset = 0
+
     this.uiComponents = {}
     // map to actor objects
     this.actors = {
@@ -734,6 +738,12 @@ TenView.prototype.render = function () {
 }
 
 TenView.prototype.tick = function () {
+    if (this.reset) {
+        this.reset--
+        if (!this.reset)
+            return this.do_reset()
+    }
+
     this.tickCounter = 10
     var playerState = (this.model.player != null)
         ? this.update_actor('player')
@@ -752,8 +762,11 @@ TenView.prototype.update_actor = function (member) {
     var actor = this.actors[member]
 
     if (ATTACKS.contains(fighter.stance)) {
-        if (!BLOCKS.contains(fighter.target.stance))
+        if (!BLOCKS.contains(fighter.target.stance)) {
             actor.strike = 1
+            if (fighter.power > 1)
+                actor.powerStrike = 1
+        }
         actor.state = 2
     } else
         actor.state = 0
@@ -775,8 +788,19 @@ TenView.prototype.idle_action = function () {
 }
 
 TenView.prototype.reset_actors = function () {
-    var dead = (this.model.player.dead) ? this.actors.player : this.actors.opponent
-    var alive = (this.model.player.dead) ? this.actors.opponent : this.actors.player
+    this.reset = 2
+    this.playerDead = (this.model.player.dead)
+    var victor = (this.playerDead) ? this.actors.opponent : this.actors.player
+
+    victor.state = 2
+    victor.strike = 1
+    victor.powerStrike = 1
+    victor.moveToAttack()
+}
+
+TenView.prototype.do_reset = function () {
+    var dead = (this.playerDead) ? this.actors.player : this.actors.opponent
+    var alive = (this.playerDead) ? this.actors.opponent : this.actors.player
     var t = rand() * TAU
 
     alive.reset()
@@ -785,15 +809,8 @@ TenView.prototype.reset_actors = function () {
     dead.body.pos.set(vsum(alive.body.pos, vang(t).prod(rand() * 100 + 400)))
     dead.head.pos.set(dead.body.pos)
 
-    if (!this.model.player.dead) {
-        dead.body.color = enemyColors[(this.model.opponent_id) % enemyColors.length]
-        dead.headStyle = dead.headStyles[this.model.opponent_id % dead.headStyles.length]
+    if (!this.playerDead) {
+        dead.body.color = enemyColors[(this.model.opponent_id -1) % enemyColors.length]
+        dead.headStyle = dead.headStyles[(this.model.opponent_id -1) % dead.headStyles.length]
     }
-    // var AB = vdiff(dead.body.pos, alive.body.pos).get()
-    // var AB_ = AB.norm().get()
-
-    // ring.setPos(vsum(alive.body.pos, AB_.prod(AB.dist() / 2)))
-
-    // AB.free()
-    // AB_.free()
 }
