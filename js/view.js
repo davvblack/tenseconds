@@ -421,21 +421,11 @@ function draw () {
 
 draw()
 
-ctx.canvas.addEventListener('mousedown', function (e) {
-    ring.r = 30 + (((rand() * 2) + 0.4 | 0) * 20)
-    ring.setPos(vsum(cam.pos, v(e.offsetX, e.offsetY)))
-    p1.state = 0
-})
-
-window.addEventListener('keydown', function (e) {
-    var key = e.keyCode
-
-    if (key === 81)
-        if (p1.state === 2)
-            p1.state = 0
-        else
-            p1.state = 2
-})
+// ctx.canvas.addEventListener('mousedown', function (e) {
+//     ring.r = 30 + (((rand() * 2) + 0.4 | 0) * 20)
+//     ring.setPos(vsum(cam.pos, v(e.offsetX, e.offsetY)))
+//     p1.state = 0
+// })
 
 // document.getElementById('size').addEventListener('change', function (e) {
 //     ring.r = +this.value
@@ -462,6 +452,8 @@ var TenView = function TenView(ctx, model) {
     uiComponent.canvas.id = "opponent-ui"
     gameContainer.appendChild(uiComponent.canvas)
     this.uiComponents.opponent = uiComponent
+
+    this.idleBeats = 2
 }
 
 
@@ -515,6 +507,8 @@ TenView.prototype.render = function () {
                     symbol = uiSymbols['sword-' + stance]
                     uiComponent.drawImage(symbol.img, symbol.pos[0] + symbolOffset, symbol.pos[1], symbol.size[0], symbol.size[1],
                         drawSymbolPosition[0], drawSymbolPosition[1], 80, 80)
+
+                    drawSymbolPosition.free()
                 }
             }
         }
@@ -522,11 +516,16 @@ TenView.prototype.render = function () {
 }
 
 TenView.prototype.tick = function () {
-    if (this.model.player != null)
-        this.updateActor('player')
+    var playerState = (this.model.player != null)
+        ? this.updateActor('player')
+        : -1
 
-    if (this.model.opponent != null)
-        this.updateActor('opponent')
+    var opponentState = (this.model.opponent != null)
+        ? this.updateActor('opponent')
+        : -1
+
+    if (!playerState && !opponentState)
+        this.randomRingChange()
 }
 
 TenView.prototype.updateActor = function (member) {
@@ -537,5 +536,20 @@ TenView.prototype.updateActor = function (member) {
         actor.state = 2, console.log('what?')
     else
         actor.state = 0
+
+    return actor.state
+}
+
+TenView.prototype.randomRingChange = function () {
+    if (this.idleBeats)
+        return this.idleBeats--
+
+    ring.setPos(vsum(ring.pos, v(
+        rand() * 300 - 150,
+        rand() * 150 - 75
+    )))
+    ring.r = 30 + (((rand() * 2) + 0.4 | 0) * 20)
+
+    this.idleBeats = 1
 }
 
