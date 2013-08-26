@@ -1,11 +1,11 @@
 <html>
 <head>
-    <title>Input Queue Test</title>
+    <title>Ten Second Samurai</title>
     <style>
         canvas { background: #f8f8f8; display: block; }
         html { background: #020202; font: 200 normal 14px/20px 'Helvetica Neue'; color: #e8e8e8;}
-        #player{position:absolute; top: 350px; left:20px; width:120px;}
-        #enemy{position:absolute; top: 350px; right:20px; width:120px;}
+        #player{position:absolute; top: 350px; left:20px; width:120px; display: none;}
+        #opponent{position:absolute; top: 350px; right:20px; width:120px; display: none;}
         .action{ width: 100px; height:100px; display: inline-block; border:1px solid black;}
         .sword{ background: url('img/sword_sprites.png');
                 background-repeat:no-repeat;
@@ -43,7 +43,7 @@
             padding:10px;
         }
         .dialog button{
-            width:
+            width: 50px; text-align: center;
         }
         #left-instructions {
             width: 35%;
