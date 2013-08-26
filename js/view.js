@@ -156,7 +156,7 @@ Actor.prototype.drawSword = function (ctx) {
 }
 
 Actor.prototype.tick = function () {
-    if (this.reactionCoolDown) {
+    if (this.reactionCoolDown && this.state !== 2) {
         this.reactionCoolDown--
         if(!this.reactionCoolDown) {
             return this.moveToDefend()
@@ -354,7 +354,7 @@ Actor.prototype.moveState = function (cooldown) {
 // document.body.appendChild(ctx.canvas)
 
 var ring = new Circle(ctx.canvas.width/2, ctx.canvas.height/2, 50)
-var p1 = new Actor(200, 200, 'rgb(52, 73, 94)')
+var p1 = new Actor(200, 200, 'rgb(189, 195, 199)')
 var p2 = new Actor(600, 400, enemyColors[0])
 
 ring.moveTo = ring.pos.clone().get()
@@ -429,7 +429,7 @@ been either totally wrong, or 'close'
 
 cam.tick = function (f) {
     // adjust camera scale
-    var rs = 2 * (this.target.r + 25)
+    var rs = 2 * (this.target.r + 30)
     var s = approach(this.scale, this.scaleSize1 / rs, 0.01)
     this.scale = s
 
@@ -501,7 +501,7 @@ function draw () {
         p1.draw(ctx)
         p2.draw(ctx)
     ctx.restore()
-    ui.draw(ctx)
+    // ui.draw(ctx)
 }
 
 draw()
