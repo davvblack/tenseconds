@@ -528,23 +528,26 @@ var TenView = function TenView(ctx, model) {
         opponent: p2
     }
 
-    var uiComponent = new Layer(900, 120)
+    var uiComponent = new Layer(900, 220)
     uiComponent.canvas.id = "player-ui"
     gameContainer.appendChild(uiComponent.canvas)
     this.uiComponents.player = uiComponent
 
-    uiComponent = new Layer(900, 120)
+    uiComponent = new Layer(900, 220)
     uiComponent.canvas.id = "opponent-ui"
     gameContainer.appendChild(uiComponent.canvas)
     this.uiComponents.opponent = uiComponent
 
     this.idleBeats = 2
+    this.tickCounter = 10
 }
 
 
 TenView.prototype.render = function () {
     var fighter, prefix, i, type, stance, symbol, drawSymbolPosition,
-        timelineOffset, propertyOffset, symbolOffset
+        timelineOffset, propertyOffset, offNavOffset, bgOffset, symbolOffsetSource,
+        indicatorOffset
+    var symbolOffsetX = this.tickCounter * 9
     var props = ["bloodied", "hp", "stam", "stagger", "tired"];
     for (member in this.model) {
         if (this.model.hasOwnProperty(member) && this.model[member].is_fighter) {
@@ -555,19 +558,28 @@ TenView.prototype.render = function () {
 
             uiComponent = this.uiComponents[type]
             uiComponent.clear()
+
             for (i = 0; i < props.length; i++) {
                 document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
             }
 
             if (type === 'player') {
+                bgOffset = 0
                 timelineOffset = 10
                 propertyOffset = 100
-                symbolOffset = 0
+                offNavOffset = 130
+                symbolOffsetSource = 0
+                indicatorOffset = 0
             } else {
-                timelineOffset = 20
-                propertyOffset = 0
-                symbolOffset = 100
+                bgOffset = 100
+                timelineOffset = 130
+                propertyOffset = 100
+                offNavOffset = 0
+                symbolOffsetSource = 100
+                indicatorOffset = 30
             }
+
+            uiComponent.fillRect(0, bgOffset, 900, 120)
 
             uiComponent.save()
             // draw hp bar
@@ -586,21 +598,42 @@ TenView.prototype.render = function () {
             for (i = 0; i < fighter.fight_queue.queue.length; i++) {
                 stance = fighter.fight_queue.queue[i].stance
                 if (stance > -1) {
-                    drawSymbolPosition = v(i * 90 + 10, timelineOffset).get()
-                    if (type === 'opponent')
-                        drawSymbolPosition[1] += 20
+                    drawSymbolPosition = v(i * 90 + 10 + symbolOffsetX, timelineOffset).get()
                     symbol = uiSymbols['sword-' + stance]
-                    uiComponent.drawImage(symbol.img, symbol.pos[0] + symbolOffset, symbol.pos[1], symbol.size[0], symbol.size[1],
+                    uiComponent.drawImage(symbol.img, symbol.pos[0] + symbolOffsetSource, symbol.pos[1], symbol.size[0], symbol.size[1],
                         drawSymbolPosition[0], drawSymbolPosition[1], 80, 80)
 
                     drawSymbolPosition.free()
                 }
             }
+
+            uiComponent.save()
+            if (BLOCKS.contains(fighter.stance)) {
+                drawSymbolPosition = v(10 + indicatorOffset, offNavOffset).get()
+                stance = fighter.stance
+                symbol = uiSymbols['sword-' + stance]
+                uiComponent.drawImage(symbol.img, symbol.pos[0] + symbolOffsetSource, symbol.pos[1], symbol.size[0], symbol.size[1],
+                        drawSymbolPosition[0], drawSymbolPosition[1], 80, 80)
+
+                drawSymbolPosition.free()
+            }
+            if (ATTACKS.contains(fighter.target.stance)) {
+                drawSymbolPosition = v(40 - indicatorOffset, offNavOffset).get()
+                stance = fighter.target.stance
+                symbol = uiSymbols['sword-' + stance]
+                uiComponent.globalAlpha = this.tickCounter / 10
+                uiComponent.drawImage(symbol.img, symbol.pos[0] + 100 - symbolOffsetSource, symbol.pos[1], symbol.size[0], symbol.size[1],
+                        drawSymbolPosition[0], drawSymbolPosition[1], 80, 80)
+                drawSymbolPosition.free()
+            }
+            uiComponent.restore()
         }
     }
+    this.tickCounter--
 }
 
 TenView.prototype.tick = function () {
+    this.tickCounter = 10
     var playerState = (this.model.player != null)
         ? this.update_actor('player')
         : -1
@@ -618,7 +651,7 @@ TenView.prototype.update_actor = function (member) {
     var actor = this.actors[member]
 
     if (ATTACKS.contains(fighter.stance))
-        actor.state = 2, console.log('what?')
+        actor.state = 2
     else
         actor.state = 0
 
