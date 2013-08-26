@@ -10,13 +10,14 @@ var DialogBox = function DialogBox (message, type, w, h, yes_label, no_label, ye
     this.handle = "dialog-" + Math.random().toString(36).substr(2);
     this.yes_label = yes_label || "ok";
     this.no_label = no_label || "cancel";
-    this.yes_callback = yes_callback || function(){that.close()};
-    this.no_callback = no_callback || function(){that.close()};
+    this.yes_callback = yes_callback || function(){tick = 1; that.close();};
+    this.no_callback = no_callback || function(){tick = 1; that.close();};
 };
 
 DialogBox.prototype.open = function () {
     var html;
-    html = "<div class = 'dialog' id='" + this.handle + "' style=' width: " + this.w + "px; height: " + this.h + "px;'><div class='button_row'>";
+    var that = this;
+    html = "<div class = 'dialog' id='" + this.handle + "' style=' width: " + this.w + "px; height: " + this.h + "px;'>" + this.message + "<div class='button_row'>";
     
     switch (this.type) {
         case DIALOG_NOTIFY:
@@ -32,6 +33,9 @@ DialogBox.prototype.open = function () {
     
     document.getElementById('yes-' + this.handle) && (document.getElementById('yes-' + this.handle).onclick = this.yes_callback);
     document.getElementById('no-' + this.handle) && (document.getElementById('no-' + this.handle).onclick = this.no_callback);
+    
+    document.addEventListener("keypress",function (e){ if(e.keyCode == 27) that.no_callback();
+                                                       if(e.keyCode == 13) that.yes_callback(); });
 }
 
 DialogBox.prototype.close = function () {

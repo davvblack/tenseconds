@@ -277,14 +277,31 @@ TenModel.prototype.set_player_by_id = function(player_id){
 }
 
 TenModel.prototype.set_opponent_by_id = function(opponent_id){
-    this.opponent = this.fighters[opponent_id].fighter;
+    var fight_obj = this.fighters[opponent_id];
+    
+    this.opponent = fight_obj.fighter;
+    
+    var dialog_text = "<h1>" + fight_obj.name + "</h1><p>" + fight_obj.desc + "</p>"; 
+    
+    tick = 0;
+    
+    var fighter_dialog = new DialogBox(dialog_text);
+    
     this.reset_fight();
+    
+    fighter_dialog.open();
 }
 
 TenModel.prototype.reset_fight = function () {
     this.player.set_target(this.opponent);
     this.opponent.set_target(this.player);
-
+    if (this.player.dead) {
+        tick = 0;
+        var dialog_text = "<h1>You died...</h1><p>" +
+        this.fighters[this.opponent_id].desc + "</p>";
+        var diedalog = new DialogBox(dialog_text);
+        diedalog.open();
+    }
     for (member in this) {
         if (this.hasOwnProperty(member) && this[member].is_fighter) {
             var fighter = this[member];
@@ -339,6 +356,7 @@ GameEngine.prototype.tick = function () {
 
                 if (this.model[member].is_player) {
                     console.log("you lost");
+                    
                     this.model.reset_fight();
                 } else {
                     console.log("you win");

@@ -15,6 +15,7 @@
         .sword-1{background-position: 0 -100px}
         .sword-3{background-position: 0 -200px}
         .sword-2{background-position: 0 -300px}
+        
 
         p {margin: .05em; position:relative;}
         .action.action-small{
@@ -40,9 +41,31 @@
             margin: 100px auto;
             background: white;
             padding:10px;
+            color: #333;
+            z-index:1000;
+        }
+        .dialog p{
+            font-size: 20px;
+        }
+        .dialog h1{
+            font-size: 30px;
+            font-weight: bold;
         }
         .dialog button{
-            width: 50px; text-align: center;
+            width: 100px; text-align: center;
+            background: #fff;
+            font-size: 30px;
+            font-weight: bold;
+            -moz-border-radius: 15px;
+            border-radius: 15px;
+
+        }
+        .button_row{
+            width: 500px;
+            position: absolute;
+            height: 40px;
+            bottom:20px;
+            text-align: center;
         }
         #left-instructions {
             width: 35%;
@@ -106,17 +129,6 @@
     <div style="clear:both">&nbsp;</div>
     <div id="game-container"></div>
 
-    <script src="js/lib/helpers.js"></script>
-    <script src="js/lib/vector.js"></script>
-    <script src="js/lib/graphics.js"></script>
-    <script src="js/lib/geometry.js"></script>
-    <script src="js/lib/keyboard.js"></script>
-    <script src="js/dialog.js"></script>
-
-    <script src="js/fighters.js"></script>
-    <script src="data/fighter_definitions.data.js"></script>
-    <script src="js/view.js"></script>
-    <script src="js/game.js"></script>
 
     <div id="player_actions">
     </div>
@@ -145,5 +157,18 @@
     <button id="dvorak" onclick="engine.input_controller.set_layout(dvorak)">dvorak</button>
     <button id="azerty" onclick="engine.input_controller.set_layout(azerty)">azerty</button>
     <button id="qwertz" onclick="engine.input_controller.set_layout(qwertz)">qwertz</button></p>
-    <div id="dialog_container"></div>
+    <div id="dialog_container">&nbsp;</div>
 </body>
+
+    <script src="js/lib/helpers.js"></script>
+    <script src="js/lib/vector.js"></script>
+    <script src="js/lib/graphics.js"></script>
+    <script src="js/lib/geometry.js"></script>
+    <script src="js/lib/keyboard.js"></script>
+    <script src="js/dialog.js"></script>
+
+    <script src="js/fighters.js"></script>
+    <script src="data/fighter_definitions.data.js"></script>
+    <script src="js/view.js"></script>
+    <script src="js/game.js"></script>
+
