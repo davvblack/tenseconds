@@ -180,7 +180,6 @@ Fighter.prototype.reset = function () {
 }
 
 Fighter.prototype.tick = function () {
-    this.stam = Math.min(this.stam_max, this.stam + this.stam_charge);
     this.hp = Math.min(this.hp_max, this.hp + this.hp_charge);
     if (this.hp / this.hp_max >= .5) {
         this.bloodied = false;
@@ -206,6 +205,10 @@ Fighter.prototype.post_tick = function () {
             this.target.damage(this.dmg_base * (this.power + 1) * (1 / (1 + this.stagger)));
             this.target.stagger += this.power;
         }
+    }
+    
+    if (this.stance == NO_STANCE) {
+        this.stam = Math.min(this.stam_max, this.stam + this.stam_charge);
     }
 
     if (!this.is_player) {
