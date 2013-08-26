@@ -32,6 +32,23 @@ uiSymbols = {
     }
 }
 
+var enemyColors = [
+    'rgb(26, 188, 156)',
+    'rgb(241, 196, 15)',
+    'rgb(52, 152, 219)',
+    'rgb(231, 76, 60)',
+    'rgb(46, 204, 113)',
+    'rgb(230, 126, 34)',
+    'rgb(155, 89, 182)',
+    'rgb(22, 160, 133)',
+    'rgb(243, 156, 18)',
+    'rgb(41, 128, 185)',
+    'rgb(192, 57, 43)',
+    'rgb(39, 174, 96)',
+    'rgb(211, 84, 0)',
+    'rgb(142, 68, 173)',
+    'rgb(189, 195, 199)'
+]
 
 
 
@@ -233,6 +250,7 @@ Actor.prototype.moveToArena = function () {
 Actor.prototype.moveToAttack = function () {
     // console.log('attack')
     this.attacking = 1
+    this.state = 0
     this.targetActor.reactionCoolDown = 10
 
     var A = this.body.pos
@@ -247,7 +265,6 @@ Actor.prototype.moveToAttack = function () {
         this.moveTo = vsum(B, BA.norm().prod(this.attackRange)).get()
     else
         this.moveTo = vsum(B, BA.norm().prod(-this.attackRange)).get()
-
     BA.free()
 }
 
@@ -337,8 +354,8 @@ Actor.prototype.moveState = function (cooldown) {
 // document.body.appendChild(ctx.canvas)
 
 var ring = new Circle(ctx.canvas.width/2, ctx.canvas.height/2, 50)
-var p1 = new Actor(200, 200, 'rgb(192, 57, 43)')
-var p2 = new Actor(600, 400, 'rgb(39, 174, 96)')
+var p1 = new Actor(200, 200, 'rgb(52, 73, 94)')
+var p2 = new Actor(600, 400, enemyColors[0])
 
 ring.moveTo = ring.pos.clone().get()
 ring.speed = 0
@@ -631,6 +648,9 @@ TenView.prototype.reset_actors = function () {
 
     dead.body.pos.set(vsum(alive.body.pos, vang(t).prod(rand() * 100 + 400)))
     dead.head.pos.set(dead.body.pos)
+
+    if (!this.model.player.dead)
+        dead.body.color = enemyColors[(this.model.opponent_id) % enemyColors.length]
 
     // var AB = vdiff(dead.body.pos, alive.body.pos).get()
     // var AB_ = AB.norm().get()
