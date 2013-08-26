@@ -284,7 +284,7 @@ TenModel.prototype.reset_fight = function () {
 var GameEngine = function GameEngine(ctx, keyboard_layout) {
     var that = this;
     
-    this.tick = false;
+    this.paused = true;
     this.ctx = ctx;
     this.keyboard_layout = keyboard_layout;
 
@@ -295,7 +295,7 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
     this.input_controller = new KeyListener(qwerty, function(input){input_handler(input, that.model)});
 
     
-    this.heartbeat = setInterval(function () {if(that.tick)that.tick();} , 1000);
+    this.heartbeat = setInterval(function () {if(tick)that.tick();} , 1000);
     
     this.frame_renderer = setInterval(function () {that.view.render();}, 100);
 
