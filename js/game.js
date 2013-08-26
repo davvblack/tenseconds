@@ -82,9 +82,9 @@ FightQueue.prototype.tick = function () {
         this.queue[i] = this.queue[i+1];
         show_moves += this.queue[i].stance + ',';
     }
-   
+
     //console.log(((this.fighter.is_player)?"player:":"enemy: ") + show_moves + " stance: " + STANCE_NAMES[this.fighter.stance] + this.fighter.power);
-    
+
     this.queue[FIGHT_QUEUE_DEPTH - 1] = {stance: NO_STANCE, power: 0};
 };
 
@@ -206,7 +206,7 @@ Fighter.prototype.post_tick = function () {
             this.target.stagger += this.power;
         }
     }
-    
+
     if (this.stance == NO_STANCE) {
         this.stam = Math.min(this.stam_max, this.stam + this.stam_charge);
     }
@@ -286,7 +286,7 @@ TenModel.prototype.reset_fight = function () {
 
 var GameEngine = function GameEngine(ctx, keyboard_layout) {
     var that = this;
-    
+
     this.paused = true;
     this.ctx = ctx;
     this.keyboard_layout = keyboard_layout;
@@ -297,16 +297,16 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
 
     this.input_controller = new KeyListener(qwerty, function(input){input_handler(input, that.model)});
 
-    
+
     this.heartbeat = setInterval(function () {if(tick)that.tick();} , 1000);
-    
+
     this.frame_renderer = setInterval(function () {that.view.render();}, 100);
 
     parse_fighters(fighter_definitions, this.model.fighters);
 
     this.model.set_player_by_id(0);
     this.model.set_opponent_by_id(1);
-    
+
 };
 
 // moved ctx definition into view.js
@@ -325,6 +325,7 @@ GameEngine.prototype.tick = function () {
             this.model[member].post_tick();
         }
     }
+    this.view.tick()
 }
 
 var engine = new GameEngine(ctx, qwerty);

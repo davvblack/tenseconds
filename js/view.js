@@ -34,98 +34,7 @@ uiSymbols = {
 
 
 
-var TenView = function TenView(ctx, model) {
-    this.ctx = ctx;
-    this.model = model;
 
-    this.uiComponents = {}
-
-    var uiComponent = new Layer(900, 120)
-    uiComponent.canvas.id = "player-ui"
-    gameContainer.appendChild(uiComponent.canvas)
-    this.uiComponents.player = uiComponent
-
-    uiComponent = new Layer(900, 120)
-    uiComponent.canvas.id = "enemy-ui"
-    gameContainer.appendChild(uiComponent.canvas)
-    this.uiComponents.enemy = uiComponent
-}
-
-
-TenView.prototype.render = function () {
-    var fighter, prefix, i, type, stance, symbol, drawSymbolPosition,
-        timelineOffset, propertyOffset
-    var props = ["bloodied", "hp", "stam", "stagger", "tired"];
-    for (member in this.model) {
-        if (this.model.hasOwnProperty(member) && this.model[member].is_fighter) {
-            fighter = this.model[member];
-
-            type = (fighter.is_player) ? 'player' : 'enemy'
-            prefix = type + '_'
-
-            uiComponent = this.uiComponents[type]
-            uiComponent.clear()
-            for (i = 0; i < props.length; i++) {
-                document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
-            }
-
-            if (type === 'player') {
-                timelineOffset = 10
-                propertyOffset = 100
-            } else {
-                timelineOffset = 20
-                propertyOffset = 0
-            }
-
-            uiComponent.save()
-            // draw hp bar
-            uiComponent.fillStyle = 'rgb(100, 0, 0)'
-            uiComponent.fillRect(00, propertyOffset, 300, 20)
-            uiComponent.fillStyle = 'rgb(255, 80, 80)'
-            uiComponent.fillRect(00, propertyOffset, clamp((fighter.hp / fighter.hp_max) * 300, 0, 300) , 20)
-            // draw stampina bar
-            uiComponent.fillStyle = 'rgb(0, 0, 100)'
-            uiComponent.fillRect(600, propertyOffset, 300, 20)
-            uiComponent.fillStyle = 'rgb(80, 80, 255)'
-            uiComponent.fillRect(600, propertyOffset, clamp((fighter.stam / fighter.stam_max) * 300, 0, 300) , 20)
-            uiComponent.restore()
-
-
-            for (i = 0; i < fighter.fight_queue.queue.length; i++) {
-                stance = fighter.fight_queue.queue[i].stance
-                if (stance > -1) {
-                    drawSymbolPosition = v(i * 90 + 10, timelineOffset).get()
-                    if (type === 'enemy')
-                        drawSymbolPosition[1] += 20
-                    symbol = uiSymbols['sword-' + stance]
-                    uiComponent.drawImage(symbol.img, symbol.pos[0], symbol.pos[1], symbol.size[0], symbol.size[1],
-                        drawSymbolPosition[0], drawSymbolPosition[1], 80, 80)
-                }
-            }
-        }
-    }
-}
-
-// TenView.prototype.render = function () {
-//     var fighter, prefix, i;
-//     var props = ["bloodied", "hp", "stam", "stagger", "tired"];
-//     for (member in this.model) {
-//         if (this.model.hasOwnProperty(member)) {
-//             fighter = this.model[member];
-//             prefix = (fighter.is_player)?"player_":"enemy_";
-//             for (i = 0; i < props.length; i++) {
-//                 document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
-//             }
-
-//             var html =""
-//             for (i = 0; i < fighter.fight_queue.queue.length; i++) {
-//                 html+='<div class="action sword sword-' + fighter.fight_queue.queue[i].stance + '"></div>';
-//             }
-
-//             document.getElementById(prefix + "actions").innerHTML = html;
-//         }
-//     }
-// }
 
 //                                   .                 .                                         88                         .
 //                                 .o8               .o8                                        .8'                       .o8
@@ -528,8 +437,105 @@ window.addEventListener('keydown', function (e) {
             p1.state = 2
 })
 
-document.getElementById('size').addEventListener('change', function (e) {
-    ring.r = +this.value
-})
+// document.getElementById('size').addEventListener('change', function (e) {
+//     ring.r = +this.value
+// })
 
+
+var TenView = function TenView(ctx, model) {
+    this.ctx = ctx;
+    this.model = model;
+
+    this.uiComponents = {}
+    // map to actor objects
+    this.actors = {
+        player: p1,
+        opponent: p2
+    }
+
+    var uiComponent = new Layer(900, 120)
+    uiComponent.canvas.id = "player-ui"
+    gameContainer.appendChild(uiComponent.canvas)
+    this.uiComponents.player = uiComponent
+
+    uiComponent = new Layer(900, 120)
+    uiComponent.canvas.id = "opponent-ui"
+    gameContainer.appendChild(uiComponent.canvas)
+    this.uiComponents.opponent = uiComponent
+}
+
+
+TenView.prototype.render = function () {
+    var fighter, prefix, i, type, stance, symbol, drawSymbolPosition,
+        timelineOffset, propertyOffset, symbolOffset
+    var props = ["bloodied", "hp", "stam", "stagger", "tired"];
+    for (member in this.model) {
+        if (this.model.hasOwnProperty(member) && this.model[member].is_fighter) {
+            fighter = this.model[member];
+
+            type = (fighter.is_player) ? 'player' : 'opponent'
+            prefix = type + '_'
+
+            uiComponent = this.uiComponents[type]
+            uiComponent.clear()
+            for (i = 0; i < props.length; i++) {
+                document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
+            }
+
+            if (type === 'player') {
+                timelineOffset = 10
+                propertyOffset = 100
+                symbolOffset = 0
+            } else {
+                timelineOffset = 20
+                propertyOffset = 0
+                symbolOffset = 100
+            }
+
+            uiComponent.save()
+            // draw hp bar
+            uiComponent.fillStyle = 'rgb(100, 0, 0)'
+            uiComponent.fillRect(00, propertyOffset, 300, 20)
+            uiComponent.fillStyle = 'rgb(255, 80, 80)'
+            uiComponent.fillRect(00, propertyOffset, clamp((fighter.hp / fighter.hp_max) * 300, 0, 300) , 20)
+            // draw stampina bar
+            uiComponent.fillStyle = 'rgb(0, 0, 100)'
+            uiComponent.fillRect(600, propertyOffset, 300, 20)
+            uiComponent.fillStyle = 'rgb(80, 80, 255)'
+            uiComponent.fillRect(600, propertyOffset, clamp((fighter.stam / fighter.stam_max) * 300, 0, 300) , 20)
+            uiComponent.restore()
+
+
+            for (i = 0; i < fighter.fight_queue.queue.length; i++) {
+                stance = fighter.fight_queue.queue[i].stance
+                if (stance > -1) {
+                    drawSymbolPosition = v(i * 90 + 10, timelineOffset).get()
+                    if (type === 'opponent')
+                        drawSymbolPosition[1] += 20
+                    symbol = uiSymbols['sword-' + stance]
+                    uiComponent.drawImage(symbol.img, symbol.pos[0] + symbolOffset, symbol.pos[1], symbol.size[0], symbol.size[1],
+                        drawSymbolPosition[0], drawSymbolPosition[1], 80, 80)
+                }
+            }
+        }
+    }
+}
+
+TenView.prototype.tick = function () {
+    if (this.model.player != null)
+        this.updateActor('player')
+
+    if (this.model.opponent != null)
+        this.updateActor('opponent')
+}
+
+TenView.prototype.updateActor = function (member) {
+    var fighter = this.model[member]
+    var actor = this.actors[member]
+
+    if (ATTACKS.contains(fighter.stance))
+        actor.state = 2, console.log('what?')
+    else
+        actor.state = 0
+}
 
