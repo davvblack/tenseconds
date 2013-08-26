@@ -1,4 +1,4 @@
-var tick = 1;
+var tick = 0;
 
 var FIGHT_QUEUE_DEPTH = 10;
 
@@ -103,7 +103,7 @@ MockBody.prototype.add_fight = function (fight_coords) {
 }
 
 var AiManager = function AiManager (body, ai_params) {
-    this.initiative = .6;
+    this.initiative = .4;
     this.high_low = .5;
     this.reactiveness = 0;
     this.agro = .6;
@@ -132,8 +132,7 @@ AiManager.prototype.pick_action = function () {
                         bother = 0;
                         break;
                     }
-                    if (my_queue[i].stance != NO_STANCE && my_queue[i].stance != my_counter_stance)
-                    {
+                    if (my_queue[i].stance != NO_STANCE && my_queue[i].stance != my_counter_stance) {
                         break;
                     }
                 }
@@ -152,13 +151,13 @@ AiManager.prototype.pick_action = function () {
 
 var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max, stam_charge, dmg_base, stagger, stager_charge, ai_params) {
     this.is_player = is_player || false;
-    this.hp = hp || 10;
-    this.hp_max = hp_max || 10;
+    this.hp = hp || 100;
+    this.hp_max = hp_max || 100;
     this.hp_charge = hp_charge || 0;
     this.stam = stam || 20;
     this.stam_max = stam_max || 20;
     this.stam_charge = stam_charge || 2;
-    this.dmg_base = dmg_base || .5;
+    this.dmg_base = dmg_base || 10;
     this.fight_queue = new FightQueue(this);
     this.stagger = 0;
     this.stagger_charge = -.125;
@@ -166,11 +165,13 @@ var Fighter = function Fighter (is_player, hp, hp_max, hp_charge, stam, stam_max
     this.ai_manager = new AiManager(this, ai_params || {});
 
     //Public interface for view:
-    this.tired = !stam;
+    this.tired = !this.stam;
     this.stance = NO_STANCE;
-    this.bloodied = (hp/hp_max < .5);
+    this.bloodied = (this.hp/this.hp_max < .5);
     this.power = 0;
     this.max_power = 0;
+    
+    this.is_fighter = true;
 }
 
 Fighter.prototype.tick = function () {
@@ -192,12 +193,12 @@ Fighter.prototype.post_tick = function () {
     if(ATTACKS.contains(this.stance)){
         if (BLOCK_MAP[this.stance] == this.target.stance) {
             this.stagger += this.target.power;
-            damage = this.power - this.target.power;
+            damage = this.dmg_base * (this.power - this.target.power);
             if (damage>0) {
                 this.target.damage(damage);
             }
         } else {
-            this.target.damage((this.power + 1) * (1 / (1 + this.stagger)));
+            this.target.damage(this.dmg_base * (this.power + 1) * (1 / (1 + this.stagger)));
             this.target.stagger += this.power;
         }
     }
@@ -237,7 +238,7 @@ Fighter.prototype.make_attack = function (attack_stance) {
 }
 
 Fighter.prototype.damage = function (damage) {
-    damage = Math.floor(damage*4)/4;
+    damage = Math.floor(damage);
     this.hp -= damage;
     if (this.hp / this.hp_max < .5) {
         this.bloodied = true;
@@ -250,6 +251,7 @@ Fighter.prototype.damage = function (damage) {
 var TenModel = function TenModel () {
     this.player = new Fighter(true);
     this.opponent = new Fighter(false);
+    this.fighters = [];
     
     this.player.set_target(this.opponent);
     this.opponent.set_target(this.player);
@@ -258,7 +260,7 @@ var TenModel = function TenModel () {
 
 TenModel.prototype.tick = function () {
     for (member in this) {
-        if (this.hasOwnProperty(member)) {
+        if (this.hasOwnProperty(member) && this[member].tick) {
             this[member].tick();
         }
     }
@@ -279,7 +281,7 @@ TenView.prototype.render = function () {
     var fighter, prefix, i;
     var props = ["bloodied", "hp", "stam", "stagger", "tired"];
     for (member in this.model) {
-        if (this.model.hasOwnProperty(member)) {
+        if (this.model.hasOwnProperty(member) && this.model[member].is_fighter) {
             fighter = this.model[member];
             prefix = (fighter.is_player)?"player_":"enemy_";
             for (i = 0; i < props.length; i++) {
@@ -310,9 +312,10 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
     
     this.heartbeat = setInterval(function () {if(tick)that.model.tick();} , 1000);
     
-    this.frame_renderer = setInterval(function () {that.view.render();}, 100)
+    this.frame_renderer = setInterval(function () {that.view.render();}, 100);
+        
+    parse_fighters(fighter_definitions, this.model.fighters);
 };
-
 
 var ctx = new Layer(900, 500);
 document.body.appendChild(ctx.canvas);
