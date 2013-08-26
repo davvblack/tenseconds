@@ -409,10 +409,10 @@ function draw () {
     ctx.save()
         ring.tick()
         cam.tick()
-        ctx.save()
-            ctx.strokeStyle = 'rgb(240,210,210)'
-            ring.draw(ctx)
-        ctx.restore()
+        // ctx.save()
+        //     ctx.strokeStyle = 'rgb(240,210,210)'
+        //     ring.draw(ctx)
+        // ctx.restore()
         p1.draw(ctx)
         p2.draw(ctx)
     ctx.restore()
