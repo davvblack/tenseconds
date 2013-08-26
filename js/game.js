@@ -261,6 +261,10 @@ Fighter.prototype.damage = function (damage) {
     }
 }
 
+Fighter.prototype.get_soonest_slot = function () {
+    return clamp(FIGHT_QUEUE_DEPTH - this.stam + 1, 0, FIGHT_QUEUE_DEPTH);
+}
+
 var TenModel = function TenModel () {
     this.player = null;
     this.opponent = null;
