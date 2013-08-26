@@ -217,22 +217,24 @@ Fighter.prototype.post_tick = function () {
 }
 
 Fighter.prototype.add_fight = function (key_coords) {
-    var stance = key_coords[0];
-    var delay = key_coords[1];
-
-
-    var energy_spent = (stance != NO_STANCE) && (FIGHT_QUEUE_DEPTH - delay);
-
-    if (energy_spent > this.stam) {
-        this.tired = true;
-        console.log('...zzz');
-    } else {
-        this.stam -= energy_spent;
-        if ((stance != NO_STANCE) && (this.fight_queue.queue[delay].stance == stance )) {
-            this.fight_queue.queue[delay].power++;
+    if (key_coords) {
+        var stance = key_coords[0];
+        var delay = key_coords[1];
+    
+    
+        var energy_spent = (stance != NO_STANCE) && (FIGHT_QUEUE_DEPTH - delay);
+    
+        if (energy_spent > this.stam) {
+            this.tired = true;
+            console.log('...zzz');
         } else {
-            this.fight_queue.queue[delay].power = 0;
-            this.fight_queue.queue[delay].stance = stance;
+            this.stam -= energy_spent;
+            if ((stance != NO_STANCE) && (this.fight_queue.queue[delay].stance == stance )) {
+                this.fight_queue.queue[delay].power++;
+            } else {
+                this.fight_queue.queue[delay].power = 0;
+                this.fight_queue.queue[delay].stance = stance;
+            }
         }
     }
 }
