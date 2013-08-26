@@ -65,6 +65,17 @@ function Actor (x, y, c) {
     this.attackRange = 30
 }
 
+Actor.prototype.reset = function () {
+    this.attacking = 0
+    this.defending = 0
+    this.moveCoolDown = 0
+    this.reactionCoolDown = 0
+    this.state = 0
+    this.speed = 0
+    this._speed = 0
+    this.moveTo = null
+}
+
 Actor.prototype.draw = function (ctx) {
 
     this.drawSword(ctx)
@@ -574,18 +585,18 @@ TenView.prototype.render = function () {
 
 TenView.prototype.tick = function () {
     var playerState = (this.model.player != null)
-        ? this.updateActor('player')
+        ? this.update_actor('player')
         : -1
 
     var opponentState = (this.model.opponent != null)
-        ? this.updateActor('opponent')
+        ? this.update_actor('opponent')
         : -1
 
     if (!playerState && !opponentState)
-        this.randomRingChange()
+        this.idle_action()
 }
 
-TenView.prototype.updateActor = function (member) {
+TenView.prototype.update_actor = function (member) {
     var fighter = this.model[member]
     var actor = this.actors[member]
 
@@ -597,7 +608,7 @@ TenView.prototype.updateActor = function (member) {
     return actor.state
 }
 
-TenView.prototype.randomRingChange = function () {
+TenView.prototype.idle_action = function () {
     if (this.idleBeats)
         return this.idleBeats--
 
@@ -610,3 +621,22 @@ TenView.prototype.randomRingChange = function () {
     this.idleBeats = 1
 }
 
+TenView.prototype.reset_actors = function () {
+    var dead = (this.model.player.dead) ? this.actors.player : this.actors.opponent
+    var alive = (this.model.player.dead) ? this.actors.opponent : this.actors.player
+    var t = rand() * TAU
+
+    alive.reset()
+    dead.reset()
+
+    dead.body.pos.set(vsum(alive.body.pos, vang(t).prod(rand() * 100 + 400)))
+    dead.head.pos.set(dead.body.pos)
+
+    // var AB = vdiff(dead.body.pos, alive.body.pos).get()
+    // var AB_ = AB.norm().get()
+
+    // ring.setPos(vsum(alive.body.pos, AB_.prod(AB.dist() / 2)))
+
+    // AB.free()
+    // AB_.free()
+}

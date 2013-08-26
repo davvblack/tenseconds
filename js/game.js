@@ -293,7 +293,7 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
     var that = this;
 
     this.opponent_id = 1;
-    
+
     this.paused = true;
     this.ctx = ctx;
     this.keyboard_layout = keyboard_layout;
@@ -327,6 +327,9 @@ GameEngine.prototype.tick = function () {
     for (member in this.model) {
         if (this.model.hasOwnProperty(member) && this.model[member].post_tick) {
             if (this.model[member].is_fighter && this.model[member].dead) {
+
+                this.view.reset_actors();
+
                 if (this.model[member].is_player) {
                     console.log("you lost");
                     this.model.reset_fight();
