@@ -34,10 +34,8 @@ DialogBox.prototype.open = function () {
     document.getElementById('yes-' + this.handle) && (document.getElementById('yes-' + this.handle).onclick = this.yes_callback);
     document.getElementById('no-' + this.handle) && (document.getElementById('no-' + this.handle).onclick = this.no_callback);
     
-    document.addEventListener("keypress",
-                                                          function (e){ if(e.keyCode == 27) that.no_callback();
-                                                                        if(e.keyCode == 13) that.yes_callback();
-                                                                        });
+    document.addEventListener("keypress",function (e){ if(e.keyCode == 27) that.no_callback();
+                                                       if(e.keyCode == 13) that.yes_callback(); });
 }
 
 DialogBox.prototype.close = function () {

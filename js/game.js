@@ -295,7 +295,13 @@ TenModel.prototype.set_opponent_by_id = function(opponent_id){
 TenModel.prototype.reset_fight = function () {
     this.player.set_target(this.opponent);
     this.opponent.set_target(this.player);
-
+    if (this.player.dead) {
+        tick = 0;
+        var dialog_text = "<h1>You died...<h1><p>" +
+        this.fighters[this.opponent_id].desc;
+        var diedalog = new DialogBox(dialog_text);
+        diedalog.open();
+    }
     for (member in this) {
         if (this.hasOwnProperty(member) && this[member].is_fighter) {
             var fighter = this[member];
@@ -350,6 +356,7 @@ GameEngine.prototype.tick = function () {
 
                 if (this.model[member].is_player) {
                     console.log("you lost");
+                    
                     this.model.reset_fight();
                 } else {
                     console.log("you win");
