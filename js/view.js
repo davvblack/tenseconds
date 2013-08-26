@@ -66,8 +66,65 @@ function Actor (x, y, c) {
 }
 
 Actor.prototype.draw = function (ctx) {
+
+    this.drawSword(ctx)
     this.body.draw(ctx)
-    this.head.draw(ctx)
+    this.drawHead(ctx)
+}
+
+Actor.prototype.drawHead = function (ctx) {
+    var h = this.head
+    var p = h.pos
+    var f = h.norm.prod(h.size[0]).get()
+    var r = h.norm.cross().prod(h.size[1]).get()
+    var f2 = f.prod(2).get()
+    var r2 = r.prod(0.75).get()
+
+    ctx.save()
+    ctx.fillStyle = this.color
+    ctx.beginPath()
+    ctx.moveToVector(vsum(p, vsum(f, r)))
+    ctx.lineToVector(vsum(p, vdiff(f, r)))
+    ctx.lineToVector(vsum(p, vsum(f, r).neg()))
+    ctx.lineToVector(vsum(p, vdiff(r, f)))
+    ctx.closePath()
+    ctx.fill()
+    ctx.beginPath()
+    ctx.moveToVector(p)
+    ctx.lineToVector(vsum(p, vdiff(r2, f2)))
+    ctx.lineToVector(vsum(p, vsum(f2, r2).neg()))
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+
+    f.free()
+    r.free()
+    f2.free()
+    r2.free()
+}
+
+Actor.prototype.drawSword = function (ctx) {
+    var h = this.head
+    var d = (this.attacking) ? 65 : 50
+    var n = vsum(h.norm, this.body.norm.prod(0.5)).norm().get()
+    var p = h.pos
+    var f = vsum(p, n.prod(d)).get()
+
+    if (this.defending)
+        n.set(n.cross())
+
+    ctx.save()
+    ctx.strokeStyle = 'rgb(200,200,200)'
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.moveToVector(p)
+    ctx.lineToVector(f)
+    ctx.stroke()
+    ctx.closePath()
+    ctx.restore()
+
+    f.free()
+    n.free()
 }
 
 Actor.prototype.tick = function () {
