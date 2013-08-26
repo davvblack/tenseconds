@@ -1,3 +1,5 @@
+var SKIN_TONE = 'rgb(250, 240, 243)'
+
 var gameContainer = document.getElementById('game-container')
 var ctx = new Layer(900, 500);
 gameContainer.appendChild(ctx.canvas);
@@ -65,9 +67,11 @@ var enemyColors = [
 
 function Actor (x, y, c) {
     // body will track where the actor is MOVING to
-    this.body = new Box(x, y, 15, 20, PI, c)
+    this.body = new Box(x, y, 13, 20, PI, c)
     // head tracks what the actor is LOOKING at
     this.head = new Box(x, y, 10, 8, PI, 'rgb(0, 0, 0)')
+
+    this.headStyle = this.headStyles[0]
 
     this.moveTo = null
     this.targetActor = null
@@ -77,6 +81,8 @@ function Actor (x, y, c) {
     this.state = 0
     this.attacking = 0
     this.defending = 0
+    this.strike = 0
+    this.powerStrike = 0
     this.moveCoolDown = 0
     this.reactionCoolDown = 0
     this.attackRange = 30
@@ -100,16 +106,8 @@ Actor.prototype.draw = function (ctx) {
     this.drawHead(ctx)
 }
 
-Actor.prototype.drawHead = function (ctx) {
-    var h = this.head
-    var p = h.pos
-    var f = h.norm.prod(h.size[0]).get()
-    var r = h.norm.cross().prod(h.size[1]).get()
-    var f2 = f.prod(2).get()
-    var r2 = r.prod(0.75).get()
-
-    ctx.save()
-    ctx.fillStyle = this.color
+Actor.prototype._drawBaseHead = function (ctx, p, f, r, color) {
+    ctx.fillStyle = (color === undefined) ? this.head.color : color
     ctx.beginPath()
     ctx.moveToVector(vsum(p, vsum(f, r)))
     ctx.lineToVector(vsum(p, vdiff(f, r)))
@@ -117,18 +115,111 @@ Actor.prototype.drawHead = function (ctx) {
     ctx.lineToVector(vsum(p, vdiff(r, f)))
     ctx.closePath()
     ctx.fill()
+}
+
+
+
+Actor.prototype._drawTopKnot = function (ctx, p, f, r) {
+    var f2 = f.prod(2).get()
+    var r2 = r.prod(0.75).get()
+
+    ctx.fillStyle = this.head.color
     ctx.beginPath()
     ctx.moveToVector(p)
     ctx.lineToVector(vsum(p, vdiff(r2, f2)))
     ctx.lineToVector(vsum(p, vsum(f2, r2).neg()))
     ctx.closePath()
     ctx.fill()
+
+    f2.free()
+    r2.free()
+}
+
+Actor.prototype._drawHat = function (ctx, p, f, r) {
+    var f2 = f.prod(1.5).get()
+    var r2 = f2.cross().get()
+    var f3 = f.prod(0.5).get()
+    var r3 = f3.cross().get()
+
+    ctx.fillStyle = 'rgb(120, 80, 80)'
+    ctx.beginPath()
+    ctx.moveToVector(p)
+    ctx.moveToVector(vsum(p, vsum(f2, r2)))
+    ctx.lineToVector(vsum(p, vdiff(f2, r2)))
+    ctx.lineToVector(vsum(p, vsum(f2, r2).neg()))
+    ctx.lineToVector(vsum(p, vdiff(r2, f2)))
+    ctx.closePath()
+    ctx.fill()
+
+    ctx.fillStyle = 'rgb(160, 100, 100)'
+    ctx.beginPath()
+    ctx.moveToVector(p)
+    ctx.moveToVector(vsum(p, vsum(f3, r3)))
+    ctx.lineToVector(vsum(p, vdiff(f3, r3)))
+    ctx.lineToVector(vsum(p, vsum(f3, r3).neg()))
+    ctx.lineToVector(vsum(p, vdiff(r3, f3)))
+    ctx.closePath()
+    ctx.fill()
+
+    f2.free()
+    r2.free()
+    f3.free()
+    r3.free()
+}
+
+Actor.prototype._drawBaldStrip = function (ctx, p, f, r, color) {
+    var r2 = r.prod(0.6).get()
+    var f2 = f.prod(0.6).get()
+
+    ctx.fillStyle = (color === undefined) ? SKIN_TONE : color
+    ctx.beginPath()
+    ctx.moveToVector(vsum(p, vsum(f, r2))) // forward right
+    ctx.lineToVector(vsum(p, vdiff(f, r2))) // forward left
+    ctx.lineToVector(vsum(p, vsum(f2, r2).neg())) // back left
+    ctx.lineToVector(vsum(p, vdiff(r2, f2))) // back right
+    ctx.closePath()
+    ctx.fill()
+
+    r2.free()
+    f2.free()
+}
+
+Actor.prototype.headStyles = [
+    function (ctx, p, f, r) {
+        this._drawBaseHead(ctx, p, f, r)
+        this._drawBaldStrip(ctx, p, f, r)
+    },
+    function (ctx, p, f, r) {
+        this._drawBaseHead(ctx, p, f, r, SKIN_TONE)
+        this._drawTopKnot(ctx, p, f, r)
+    },
+    function (ctx, p, f, r) {
+        this._drawHat(ctx, p, f, r)
+    },
+    function (ctx, p, f, r) {
+        this._drawBaseHead(ctx, p, f, r)
+        this._drawBaldStrip(ctx, p, f, r)
+        this._drawTopKnot(ctx, p, f, r)
+    },
+]
+
+var playerHeadStyle = function (ctx, p, f, r) {
+    this._drawBaseHead(ctx, p, f, r)
+    this._drawTopKnot(ctx, p, f, r)
+}
+
+Actor.prototype.drawHead = function (ctx) {
+    var h = this.head
+    var p = h.pos
+    var f = h.norm.prod(h.size[0]).get()
+    var r = h.norm.cross().prod(h.size[1]).get()
+
+    ctx.save()
+    this.headStyle(ctx, p, f, r)
     ctx.restore()
 
     f.free()
     r.free()
-    f2.free()
-    r2.free()
 }
 
 Actor.prototype.drawSword = function (ctx) {
@@ -156,6 +247,9 @@ Actor.prototype.drawSword = function (ctx) {
 }
 
 Actor.prototype.tick = function () {
+    if (this.state === 2 && !this.attacking)
+        return this.moveToAttack()
+
     if (this.reactionCoolDown && this.state !== 2) {
         this.reactionCoolDown--
         if(!this.reactionCoolDown) {
@@ -179,6 +273,12 @@ Actor.prototype.move = function () {
     var AB = vdiff(B, A).get()
     var AB_ = AB.norm().get()
     var d = AB.dist()
+
+    if (this.strike && d < this.attackRange) {
+        this.strike = 0
+        this.powerStrike = 0
+        console.log('HIT') // shoot blood out here@@@
+    }
 
     if (d < 1) {
         this.idle()
@@ -259,12 +359,12 @@ Actor.prototype.moveToAttack = function () {
     var BA = vdiff(A, B).get()
 
     var r = rand()
-    if (r < 0.2)
-        this.moveTo = B.clone().get()
-    else if (r < 0.9)
+    if (!this.strike)
         this.moveTo = vsum(B, BA.norm().prod(this.attackRange)).get()
-    else
-        this.moveTo = vsum(B, BA.norm().prod(-this.attackRange)).get()
+    else if (this.strike)
+        this.moveTo = B.clone().get()
+    else if (this.powerStrike)
+        this.moveTo = vsum(B, BA.norm().prod(-1.5 * this.attackRange)).get()
     BA.free()
 }
 
@@ -356,6 +456,7 @@ Actor.prototype.moveState = function (cooldown) {
 var ring = new Circle(ctx.canvas.width/2, ctx.canvas.height/2, 50)
 var p1 = new Actor(200, 200, 'rgb(189, 195, 199)')
 var p2 = new Actor(600, 400, enemyColors[0])
+p1.headStyle = playerHeadStyle
 
 ring.moveTo = ring.pos.clone().get()
 ring.speed = 0
@@ -650,9 +751,11 @@ TenView.prototype.update_actor = function (member) {
     var fighter = this.model[member]
     var actor = this.actors[member]
 
-    if (ATTACKS.contains(fighter.stance))
+    if (ATTACKS.contains(fighter.stance)) {
+        if (!BLOCKS.contains(fighter.target.stance))
+            actor.strike = 1
         actor.state = 2
-    else
+    } else
         actor.state = 0
 
     return actor.state
@@ -682,9 +785,10 @@ TenView.prototype.reset_actors = function () {
     dead.body.pos.set(vsum(alive.body.pos, vang(t).prod(rand() * 100 + 400)))
     dead.head.pos.set(dead.body.pos)
 
-    if (!this.model.player.dead)
+    if (!this.model.player.dead) {
         dead.body.color = enemyColors[(this.model.opponent_id) % enemyColors.length]
-
+        dead.headStyle = dead.headStyles[this.model.opponent_id % dead.headStyles.length]
+    }
     // var AB = vdiff(dead.body.pos, alive.body.pos).get()
     // var AB_ = AB.norm().get()
 

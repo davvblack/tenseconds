@@ -41,5 +41,56 @@ CanvasRenderingContext2D.prototype.lineToVector = function (v) {
 Sprite = function Sprite (w, h, u, v, src) {
     this.w = w;
     this.h = h;
-    
+
 }
+
+
+
+Particle = function (pos, norm, size, velocity, color) {
+    this.pos = pos
+    this.norm = norm
+    this.size = size
+    this.life = 100
+    this.velocity = velocity
+    this.color = color
+}
+
+Particle.prototype.tick = function ()  {
+    this.pos.set(vsum(this.pos, this.norm.prod(this.velocity)))
+    this.size.set(this.size.prod(1.01))
+    this.velocity = this.velocity * 0.99
+    this.life--
+
+    if (this.life)
+        return 1
+
+    return this.destroy()
+}
+
+Particle.prototype.draw = function (ctx) {
+    var p = this.pos
+    var f = this.norm.prod(this.size[0]).get()
+    var r = this.norm.cross().prod(this.size[1]).get()
+
+    ctx.save()
+    ctx.fillStyle = this.color
+    ctx.beginPath()
+    ctx.moveToVector(vsum(p, vsum(f, r)))
+    ctx.lineToVector(vsum(p, vdiff(f, r)))
+    ctx.lineToVector(vsum(p, vsum(f, r).neg()))
+    ctx.lineToVector(vsum(p, vdiff(r, f)))
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+
+    f.free()
+    r.free()
+}
+
+Particle.prototype.destroy = function () {
+    this.pos.free()
+    this.norm.free()
+    this.size.free()
+    return 0
+}
+
