@@ -259,6 +259,7 @@ Fighter.prototype.damage = function (damage) {
     if (this.hp < 0) {
         this.dead = true;
     }
+    this.stance = NO_STANCE;
 }
 
 Fighter.prototype.get_soonest_slot = function () {
