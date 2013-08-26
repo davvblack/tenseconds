@@ -207,7 +207,7 @@ Fighter.prototype.post_tick = function () {
         }
     }
     
-    if (this.stance == NO_STANCE) {
+    if (this.stance == NO_STANCE || BLOCKS.contains(this.stance) && this.power == 0) {
         this.stam = Math.min(this.stam_max, this.stam + this.stam_charge);
     }
 
@@ -320,7 +320,11 @@ GameEngine.prototype.tick = function () {
     for (member in this.model) {
         if (this.model.hasOwnProperty(member) && this.model[member].post_tick) {
             if (this.model[member].is_fighter && this.model[member].dead) {
-                console.log(",.,, someone died");
+                if (this.model[member].is_player) {
+                    console.log("you lost");
+                } else {
+                    console.log("you win");
+                }
             }
             this.model[member].post_tick();
         }
