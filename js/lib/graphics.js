@@ -46,7 +46,7 @@ Sprite = function Sprite (w, h, u, v, src) {
 
 
 
-Particle = function (pos, norm, size, velocity, color) {
+function Particle (pos, norm, size, velocity, color) {
     this.pos = pos
     this.norm = norm
     this.size = size
@@ -54,6 +54,8 @@ Particle = function (pos, norm, size, velocity, color) {
     this.velocity = velocity
     this.color = color
 }
+
+var particles = new Pool(Particle)
 
 Particle.prototype.tick = function ()  {
     this.pos.set(vsum(this.pos, this.norm.prod(this.velocity)))

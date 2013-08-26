@@ -75,3 +75,46 @@ function construct(constructor, args) {
     F.prototype = constructor.prototype;
     return new F();
 }
+
+
+
+function Pool (ConstructorFunction) {
+    this.ConstructorFunction = ConstructorFunction
+    this.inactive = []
+    this.active = []
+}
+
+Pool.prototype.pop = function () {
+    if (this.inactive.length)
+        return this.inactive.pop()
+
+    return new this.ConstructorFunction()
+}
+
+Pool.prototype.push = function (obj) {
+    this.inactive.push(obj)
+}
+
+Pool.prototype.get = function () {
+    var p = this.pop()
+    this.active.push(p)
+    return p
+}
+
+// give a function.  it will be called for all items in the active pool
+// if it returns falsey, that item will be returned to the inactive pool
+Pool.prototype.tick = function (fnc) {
+    var n = 0
+    var i = 0
+    var l = this.active.length
+    while (i < l) {
+        if (fnc(this.active[i])) {
+            this.active[n] = this.active[i]
+            n++
+        } else {
+            this.push(this.active[i])
+        }
+        i++
+    }
+    activeParticles.length = n
+}
