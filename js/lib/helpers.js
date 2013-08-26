@@ -67,3 +67,11 @@ Array.prototype.random_choice = function (key_too) {
 function roll (target) {
     return Math.random() < target;
 }
+
+function construct(constructor, args) {
+    function F() {
+        return constructor.apply(this, args);
+    }
+    F.prototype = constructor.prototype;
+    return new F();
+}
