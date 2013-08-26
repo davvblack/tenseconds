@@ -270,31 +270,7 @@ TenModel.prototype.tick = function () {
 }
 
 
-var TenView = function TenView(ctx, model) {
-    this.ctx = ctx;
-    this.model = model;
-}
 
-TenView.prototype.render = function () {
-    var fighter, prefix, i;
-    var props = ["bloodied", "hp", "stam", "stagger", "tired"];
-    for (member in this.model) {
-        if (this.model.hasOwnProperty(member)) {
-            fighter = this.model[member];
-            prefix = (fighter.is_player)?"player_":"enemy_";
-            for (i = 0; i < props.length; i++) {
-                document.getElementById(prefix + props[i]).innerHTML = fighter[props[i]];
-            }
-
-            var html =""
-            for (i = 0; i < fighter.fight_queue.queue.length; i++) {
-                html+='<div class="action sword sword-' + fighter.fight_queue.queue[i].stance + '"></div>';
-            }
-
-            document.getElementById(prefix + "actions").innerHTML = html;
-        }
-    }
-}
 
 
 var GameEngine = function GameEngine(ctx, keyboard_layout) {
@@ -314,8 +290,7 @@ var GameEngine = function GameEngine(ctx, keyboard_layout) {
 };
 
 
-var ctx = new Layer(900, 500);
-document.body.appendChild(ctx.canvas);
+// moved ctx definition into view.js
 
 var engine = new GameEngine(ctx, qwerty);
 
