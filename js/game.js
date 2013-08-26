@@ -327,6 +327,8 @@ GameEngine.prototype.tick = function () {
                 } else {
                     console.log("you win");
                 }
+                //Prevent winloss. I think this means the player always wins in a tie.
+                break;
             }
             this.model[member].post_tick();
         }
