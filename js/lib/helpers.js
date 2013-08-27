@@ -88,18 +88,20 @@ Pool.prototype.pop = function () {
     if (this.inactive.length)
         return this.inactive.pop()
 
-    return new this.ConstructorFunction()
+    var p = new this.ConstructorFunction()
+    this.active.push(p)
+    return p
 }
 
 Pool.prototype.push = function (obj) {
     this.inactive.push(obj)
 }
 
-Pool.prototype.get = function () {
-    var p = this.pop()
-    this.active.push(p)
-    return p
-}
+// Pool.prototype.get = function () {
+//     var p = this.pop()
+//     this.active.push(p)
+//     return p
+// }
 
 // give a function.  it will be called for all items in the active pool
 // if it returns falsey, that item will be returned to the inactive pool
@@ -116,5 +118,5 @@ Pool.prototype.tick = function (fnc) {
         }
         i++
     }
-    activeParticles.length = n
+    this.active.length = n
 }

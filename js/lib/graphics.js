@@ -41,26 +41,36 @@ CanvasRenderingContext2D.prototype.lineToVector = function (v) {
 Sprite = function Sprite (w, h, u, v, src) {
     this.w = w;
     this.h = h;
-
 }
 
 
 
-function Particle (pos, norm, size, velocity, color) {
-    this.pos = pos
-    this.norm = norm
-    this.size = size
-    this.life = 100
-    this.velocity = velocity
-    this.color = color
+function Particle () {
+    this.pos = null
+    this.norm = null
+    this.size = null
+    this.life = 0
+    this.velocity = 0
+    this.color = 'red'
 }
 
 var particles = new Pool(Particle)
 
+Particle.prototype.init = function (pos, norm, size, velocity, color) {
+    this.pos = pos
+    this.norm = norm
+    this.size = size
+    this.life = 600
+    this.velocity = velocity
+    this.color = color
+}
+
 Particle.prototype.tick = function ()  {
-    this.pos.set(vsum(this.pos, this.norm.prod(this.velocity)))
-    this.size.set(this.size.prod(1.01))
-    this.velocity = this.velocity * 0.99
+    if (this.velocity) {
+        this.pos.set(vsum(this.pos, this.norm.prod(this.velocity)))
+        this.size.set(this.size.prod(1.1))
+        this.velocity--
+    }
     this.life--
 
     if (this.life)

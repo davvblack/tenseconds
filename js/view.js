@@ -277,10 +277,14 @@ Actor.prototype.move = function () {
     if (this.strike && d < this.attackRange) {
         this.strike = 0
         this.powerStrike = 0
-        console.log('HIT') // shoot blood out here@@@
+        makeBlood(A.clone().get(), this.targetActor.body.pos.clone().get())
+        // console.log('HIT') // shoot blood out here@@@
     }
 
     if (d < 1) {
+        if (this.strike)
+            makeBlood(A.clone().get(), this.targetActor.body.pos.clone().get())
+
         this.idle()
     }
 
@@ -575,6 +579,36 @@ cam.tick = function (f) {
 
 var ticksTillRandomAction = 60
 
+function particleTick (particle) {
+    particle.tick()
+    particle.draw(ctx)
+    return particle.life
+}
+
+function makeBlood (A, B) {
+
+    var norm = vdiff(B, A).norm().get()
+    var cross = norm.cross().get()
+
+    var i = 5
+    while (i-- > 0)
+        particles.pop().init(
+            vsum(A, norm.prod(50 * rand())).get(),
+            vsum(norm, cross.prod(rand() * 0.8 - 0.4)).norm().get(),
+            v(3 + (rand() * 10), 2).get(),
+            10,
+            'rgb(255, 0, 50)'
+        )
+
+    // particles.pop().init(vsum(A, norm.prod(20 * rand())).get(), norm,
+    //     v(10, 2).get(), 10, 'rgb(255, 0, 50)')
+    // particles.pop().init(A, vsum(norm, cross.prod(rand() * -0.4)).norm().get(),
+    //     v(7, 1).get(), 10, 'rgb(255, 0, 50)')
+    A.free()
+    B.free()
+    norm.free()
+}
+
 function draw () {
     requestAnimationFrame(draw)
 
@@ -582,11 +616,11 @@ function draw () {
     p1.tick()
     p2.tick()
 
+
     if (p1.state === 0 && p2.state === 0) {
         if (ticksTillRandomAction)
             ticksTillRandomAction--
         else {
-            // console.log('random action')
             ticksTillRandomAction = 60
         }
 
@@ -596,6 +630,7 @@ function draw () {
     ctx.save()
         ring.tick()
         cam.tick()
+        particles.tick(particleTick)
         // ctx.save()
         //     ctx.strokeStyle = 'rgb(240,210,210)'
         //     ring.draw(ctx)
