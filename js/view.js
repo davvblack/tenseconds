@@ -590,12 +590,12 @@ function makeBlood (A, B) {
     var norm = vdiff(B, A).norm().get()
     var cross = norm.cross().get()
 
-    var i = 5
+    var i = 4
     while (i-- > 0)
         particles.pop().init(
             vsum(A, norm.prod(50 * rand())).get(),
             vsum(norm, cross.prod(rand() * 0.8 - 0.4)).norm().get(),
-            v(3 + (rand() * 10), 2).get(),
+            v(3 + (rand() * 9), 2).get(),
             10,
             'rgb(255, 0, 50)'
         )
