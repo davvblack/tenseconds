@@ -225,7 +225,7 @@ Fighter.prototype.add_fight = function (key_coords) {
         var delay = key_coords[1];
 
 
-        var energy_spent = (stance != NO_STANCE) && (FIGHT_QUEUE_DEPTH - delay);
+        var energy_spent = (stance != NO_STANCE) && (FIGHT_QUEUE_DEPTH - delay + 2);
 
         if (energy_spent > this.stam) {
             this.tired = true;
