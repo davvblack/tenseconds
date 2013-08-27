@@ -1,6 +1,6 @@
 fighter_definitions = [
 ["default,",100,100,0,20,20,2,10,0,-0.125,0.4,0.5,0,0.6,0.4,0,","],
-["Old Man,",40,40,0,20,20,2,6,0,-0.125,0.3,0,0,1,0,0,"The old man down the street can barely lift his sword, yet still challenges you to a duel.  <br>Use low block (keys 'Z' through '/') to easily take no damage from him, then high attack (keys '1' through '0') to kill him."],
+["Old Man,",40,40,0,20,20,2,6,0,-0.125,0.3,0,0,1,0,0,"The old man down the street can barely lift his sword, yet still challenges you to a duel.  </p><p>Use Low Block (keys 'Z' through '/') to easily take no damage from him, then High Attack (keys '1' through '0') to kill him."],
 ["Young Thug,",150,150,0,40,40,0.25,8,0,-0.125,0.3,0.5,0,1,0,0.8,"A young criminal down the street shouts, 'What did you just do to my dad!?'.  You think he stole something, so you move in to attack.  He is very angry, but will tire quickly.  Block his wild attacks until he calms down, then cut him down."],
 ["Student,",60,60,0,20,20,2,4,0,-0.125,0.3,0.5,0,0.6,0.4,0,"You enter a dojo and see a student training.  He offers you a friendly duel to the friendly death.  He practices his blocking moves against you, but isn't very good at timing them.  Don't attack into a block or you will be staggered and deal less damage for a few seconds."],
 ["School Teacher,",80,80,0,20,20,2,4,0,-0.125,0.2,0.5,0.5,0.6,0.4,0,"The teacher is not super-pleased about what just happened.  He is better at timing attacks and will react to you.  Consider replacing an attack that will be blocked with one that won't."],
